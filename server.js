@@ -151,6 +151,31 @@ const SERVICES = [
   ['Siding', ['siding', 'vinyl siding', 'exterior wall', 'cladding', 'soffit', 'fascia']],
 ];
 
+// Words that are clearly NOT a person's first name. Used to reject a name the
+// AI mis-read from an answer about the problem (e.g. "roof", "basement").
+const NOT_A_NAME = new Set([
+  'roof','roofing','shingle','shingles','gutter','gutters','downspout',
+  'plumbing','pipe','pipes','faucet','drain','clog','sewer','water','heater','leak','leaking','flood','flooded','sewage','burst','toilet','running',
+  'hvac','heating','cooling','furnace','ac','air','conditioner','thermostat','duct','ducts',
+  'electrical','electrician','breaker','panel','panels','wiring','outlet','outlets','ev','charger','light','switch','switches',
+  'garage','door','opener','spring','springs',
+  'bath','bathroom','shower','tub','tile','vanity','tiles',
+  'lock','key','keys','deadbolt','ignition','locked',
+  'kitchen','cabinet','cabinets','counter','counters','backsplash','sink',
+  'landscape','landscaping','tree','trees','lawn','garden','yard','shrub','shrubs','mulch',
+  'cleaning','carpet','upholstery','chimney','dryer','vent','pressure','wash','maid',
+  'appliance','appliances','dishwasher','refrigerator','fridge','oven','stove','microwave','washer','ice','maker',
+  'move','moving','pack','transport','relocation','movers',
+  'paint','painting','floor','flooring','hardwood','laminate','vinyl','wall','walls','color',
+  'foundation','concrete','driveway','crack','settling',
+  'dumpster','dumpsters','junk','debris','rolloff','roll-off','waste','trash','container','haul',
+  'final','expense','life','insurance','funeral','burial','cremation','death','benefit','beneficiary','quote','quotes',
+  'handyman','odd','job','jobs','small','repair','repairs','hang','tv','furniture','assembly','minor','general','around','house','home',
+  'portable','toilet','porta','potty','restroom','event',
+  'siding','cladding','soffit','fascia',
+  'mold','mildew','pest','pests','rodent','rodents','rats','mice','mouse','ants','roaches','cockroach','cockroaches','termites','termite','bedbugs','bed','bugs','wasps','spiders','exterminator','infestation'
+]);
+
 function classifyByKeywords(text) {
   const t = text.toLowerCase();
   // Strong, specific overrides: a leaking/broken roof or gutter is that trade,
@@ -472,6 +497,9 @@ Other rules:
 - If the visitor volunteers several answers at once, you may skip ahead — but still confirm
   each piece and still show the summary before revealing the number.
 - One question at a time. Do not list all services.
+- NEVER treat the answer to a question about the problem as the visitor's name
+  (e.g. "roof", "basement", "kitchen"). A name is only a real person's first name,
+  given in answer to "what's your first name?" or phrased like "my name is ...".
 - NEVER invent pricing, appointments, or credit-card details. You do not schedule.
 
 FORMAT (strict): End your reply with a single line starting with @@JSON@@ followed by one
@@ -602,8 +630,23 @@ async function handleChat(messages) {
     lead.phone = lead.phone || exPhone;
     lead.email = lead.email || exEmail;
     lead.state = lead.state || exState;
+
+    // Safety net: never accept a service word / object keyword as a person's
+    // name. If the model mistook an answer like "roof" for the first name, drop
+    // it and ask for the name properly instead of jumping ahead to ZIP/phone.
+    let badName = false;
+    if (lead.firstName) {
+      const fn = String(lead.firstName).trim().toLowerCase();
+      if (fn.length < 2 || NOT_A_NAME.has(fn)) { lead.firstName = ''; badName = true; }
+    }
+
     const service = typeof parsed.service === 'string' && parsed.service ? parsed.service : null;
     const complete = !!parsed.complete;
+
+    if (badName) {
+      const svc = service ? ` — that sounds like our ${service} team` : '';
+      return { reply: `Thanks for telling me about that${svc}. What's your first name, so I know who I'm helping?`, service: null, complete: false };
+    }
 
     // Qualification gate: the assistant must have gathered (issue, first name, ZIP,
     // phone) over at least 3 exchanges before we capture a lead, run the auction,
