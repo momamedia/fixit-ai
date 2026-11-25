@@ -551,6 +551,23 @@
         }
       }
 
+      // On mobile, lock the page scroll while the chat input is focused so
+      // the browser can't jerk the page away from the conversation when the
+      // keyboard opens or a message is sent. The chat's own message list
+      // keeps scrolling normally inside its container.
+      function isMobileView() {
+        return window.matchMedia('(max-width: 720px)').matches;
+      }
+      function lockPageScroll() {
+        if (!isMobileView()) return;
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+      }
+      function unlockPageScroll() {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+      }
+
       text.addEventListener('input', function () {
         text.style.height = 'auto';
         text.style.height = Math.min(text.scrollHeight, 120) + 'px';
@@ -560,6 +577,15 @@
       });
       sendBtn.addEventListener('click', function () { var v = text.value.trim(); if (v) send(v); });
       newChat.addEventListener('click', resetChat);
+
+      // Lock the page while typing in the chat, unlock when leaving the input.
+      text.addEventListener('focus', function () {
+        lockPageScroll();
+        keepChatVisible();
+      });
+      text.addEventListener('blur', function () {
+        setTimeout(unlockPageScroll, 300);
+      });
 
       // Mobile "Talk to the AI" bar: smooth-scroll to the chat and focus
       // the input without the page jumping past the conversation.
