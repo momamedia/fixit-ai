@@ -462,9 +462,9 @@ Before you have all four pieces (issue, first name, ZIP, phone):
 ONLY AFTER all four pieces are in hand:
 - Give a one-line summary to confirm ("Got it, John — leaking water heater in 90210, and
   the team can reach you at the number you provided").
-- Then tell them which ${BUSINESS.name} service it is, say a team member will call them
-  back, and say the number to call is shown in the call card on the page. Do NOT spell out
-  or type any phone number yourself — the card provides it.
+- Then tell them which ${BUSINESS.name} service it is, ask them to call right away — a
+  technician is standing by — and say the number to call is shown in the call card on the
+  page. Do NOT spell out or type any phone number yourself — the card provides it.
 
 Other rules:
 - Pick the RIGHT service. A leaking roof, missing shingles, or roof damage is **Roofing** (not Water Damage Restoration), even if water is coming inside. Clogged/broken gutters are **Gutter Services**. **Water Damage Restoration** is for flooding, burst pipes, sewage, or mold/water cleanup inside the home (not a roof/gutter issue). A water heater or pipe leak is **Plumbing**. Mold/mildew growth or mold cleanup is **Mold Removal**. Pests, rodents, or insects are **Pest Control**. When in doubt, match the thing that needs to be repaired.
@@ -720,9 +720,9 @@ async function handleChat(messages) {
     let callNow = null;
     if (r.ok && r.accepted && r.bridgePhone) callNow = { phone: r.bridgePhone, bid: r.bid };
     const servicePhone = getServicePhone(rec.service);
-    const callText = ' The number to call is shown in the call card on the page.';
+    const callText = ' Please call us now — a technician is standing by. The number to call is shown in the call card on the page.';
     return {
-      reply: `Thanks, ${firstName || 'there'} — that's a ${rec.service} job in ${zipCode || 'your area'}. A team member will call you back shortly${phone ? ` at ${phone}` : ''}.${callText}`,
+      reply: `Thanks, ${firstName || 'there'} — that's a ${rec.service} job in ${zipCode || 'your area'}.${callText}`,
       service: rec.service,
       complete: true,
       servicePhone,
