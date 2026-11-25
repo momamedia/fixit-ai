@@ -485,8 +485,8 @@ Before you have all four pieces (issue, first name, ZIP, phone):
 - Just acknowledge the answer and ask the next question. Keep each reply short and warm.
 
 ONLY AFTER all four pieces are in hand:
-- Give a one-line summary to confirm ("Got it, John — leaking water heater in 90210, and
-  the team can reach you at the number you provided").
+- Give a one-line summary to confirm ("Got it, John — leaking water heater in 90210. You
+  can reach our team at the number in the call card below").
 - Then tell them which ${BUSINESS.name} service it is, ask them to call right away — a
   technician is standing by — and say the number to call is shown in the call card on the
   page. Do NOT spell out or type any phone number yourself — the card provides it.
