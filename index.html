@@ -519,12 +519,14 @@
               .catch(function () {});
           }
           sendBtn.disabled = false;
-          text.focus();
+          text.focus({ preventScroll: true });
+          keepChatVisible();
         })
         .catch(function () {
           t.remove();
           addMsg('assistant', 'Sorry, I had trouble reaching my assistant. Please try again in a moment.');
           sendBtn.disabled = false;
+          keepChatVisible();
         });
         text.value = '';
         text.style.height = 'auto';
@@ -536,6 +538,19 @@
         addMsg('assistant', "Welcome to Top Shield Home Services! What's going on around your home, and how can I help?");
       }
 
+      // Keep the chat box on screen (e.g. after sending, so mobile users
+      // don't have to scroll back to it).
+      function keepChatVisible() {
+        var chatBox = document.getElementById('chat');
+        if (!chatBox || !chatBox.scrollIntoView) return;
+        var r = chatBox.getBoundingClientRect();
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        // Only scroll if the chat is mostly off-screen.
+        if (r.bottom < 120 || r.top > vh - 120) {
+          chatBox.scrollIntoView({ behavior: 'auto', block: 'center' });
+        }
+      }
+
       text.addEventListener('input', function () {
         text.style.height = 'auto';
         text.style.height = Math.min(text.scrollHeight, 120) + 'px';
@@ -545,6 +560,21 @@
       });
       sendBtn.addEventListener('click', function () { var v = text.value.trim(); if (v) send(v); });
       newChat.addEventListener('click', resetChat);
+
+      // Mobile "Talk to the AI" bar: smooth-scroll to the chat and focus
+      // the input without the page jumping past the conversation.
+      var mobileChatBtn = document.getElementById('mobileChatBtn');
+      if (mobileChatBtn) {
+        mobileChatBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          var chatBox = document.getElementById('chat');
+          if (chatBox && chatBox.scrollIntoView) chatBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(function () {
+            text.focus({ preventScroll: true });
+            keepChatVisible();
+          }, 350);
+        });
+      }
 
       resetChat();
 
