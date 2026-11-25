@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call Timing Flow — Top Shield Home Services</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; padding: 24px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #6e6e73; margin-bottom: 20px; font-size: 14px; }
+  .board { display: flex; gap: 20px; flex-wrap: wrap; }
+  .column { flex: 1; min-width: 300px; background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+  .column h2 { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .flow { position: relative; }
+  .step { border: 2px solid; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; position: relative; background: #fff; }
+  .step .label { font-weight: 600; font-size: 14px; }
+  .step .detail { font-size: 13px; color: #6e6e73; margin-top: 3px; }
+  .step .time { font-size: 12px; font-weight: 700; margin-top: 6px; display: inline-block; padding: 3px 8px; border-radius: 20px; }
+  .step::after { content: '▼'; position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); color: #b0b0b5; font-size: 14px; }
+  .step:last-child::after { display: none; }
+  .ok { border-color: #34c759; }
+  .ok .time { background: #e9f9ee; color: #1d7a35; }
+  .warn { border-color: #ff9f0a; }
+  .warn .time { background: #fff4e5; color: #b26b00; }
+  .bad { border-color: #ff3b30; }
+  .bad .time { background: #ffe7e5; color: #c12b23; }
+  .note { margin-top: 16px; font-size: 13px; background: #f5f5f7; border-radius: 10px; padding: 12px; color: #3a3a3c; line-height: 1.5; }
+  .legend { display: flex; gap: 16px; margin-top: 20px; font-size: 13px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .badge { display:inline-block; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; margin-left:8px; }
+  .badge.red { background:#ffe7e5; color:#c12b23; }
+  .badge.green { background:#e9f9ee; color:#1d7a35; }
+</style>
+</head>
+<body>
+  <h1>Call Timing Flow — where calls connect and where they fail</h1>
+  <div class="sub">Lead Router RTB routing (current behavior) vs. Proaxis direct bridge</div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#34c759"></span>OK</span>
+    <span><span class="dot" style="background:#ff9f0a"></span>Timing risk</span>
+    <span><span class="dot" style="background:#ff3b30"></span>FAIL</span>
+  </div>
+
+  <div class="board">
+    <!-- LEAD ROUTER PATH -->
+    <div class="column">
+      <h2>🔁 Lead Router path <span class="badge red">fails</span></h2>
+      <div class="flow">
+        <div class="step ok">
+          <div class="label">1. Visitor calls tracking number</div>
+          <div class="detail">e.g. (213) 652-7656 or DNI unique number</div>
+          <span class="time">t=0</span>
+        </div>
+        <div class="step ok">
+          <div class="label">2. Lead Router receives the call</div>
+          <div class="detail">SignalWire → campaign routing engine</div>
+          <span class="time">t ≈ 0–1s</span>
+        </div>
+        <div class="step warn">
+          <div class="label">3. Lead Router pings buyers (RTB auction)</div>
+          <div class="detail">Proaxis, Lead Smart asked for a bid</div>
+          <span class="time">auction runs (~1s)</span>
+        </div>
+        <div class="step warn">
+          <div class="label">4. A buyer bids → reservation minted</div>
+          <div class="detail">e.g. Lead Smart wins, $38.70</div>
+          <span class="time">bid is valid ~13s</span>
+        </div>
+        <div class="step bad">
+          <div class="label">5. Call must route within ~13 seconds</div>
+          <div class="detail">If routing finishes after the reservation expires → <b>RTB_LATE_PING_LR-103</b></div>
+          <span class="time">window ~13s ⚠️</span>
+        </div>
+        <div class="step bad">
+          <div class="label">6. Call hangs up — not connected</div>
+          <div class="detail">No buyer destination reached in time</div>
+          <span class="time">FAIL</span>
+        </div>
+      </div>
+      <div class="note"><b>Root cause:</b> The Lead Router's internal RTB reservation/window is ~13s, and it is not adjustable from the account/platform API we can access.</div>
+    </div>
+
+    <!-- PROAXIS BRIDGE PATH -->
+    <div class="column">
+      <h2>⚡ Proaxis direct bridge <span class="badge green">connects</span></h2>
+      <div class="flow">
+        <div class="step ok">
+          <div class="label">1. Visitor completes chat (qualified)</div>
+          <div class="detail">Name + ZIP + phone collected</div>
+          <span class="time">t=0</span>
+        </div>
+        <div class="step ok">
+          <div class="label">2. Our server pings Proaxis directly</div>
+          <div class="detail">Not through the Lead Router auction</div>
+          <span class="time">~1s</span>
+        </div>
+        <div class="step ok">
+          <div class="label">3. Proaxis returns a bridge number</div>
+          <div class="detail">e.g. +1 424-509-1346, bid $27.44</div>
+          <span class="time">reservation ~240s (4 min)</span>
+        </div>
+        <div class="step ok">
+          <div class="label">4. Chat shows "Call now" with the bridge number</div>
+          <div class="detail">Visitor has plenty of time to dial</div>
+          <span class="time">window 240s ✅</span>
+        </div>
+        <div class="step ok">
+          <div class="label">5. Visitor calls the bridge number</div>
+          <div class="detail">Connected directly to the Proaxis buyer</div>
+          <span class="time">CONNECTED</span>
+        </div>
+      </div>
+      <div class="note"><b>Why it works:</b> Proaxis holds its reservation for <b>240 seconds</b>, so the visitor can comfortably call before it expires — no 13s race.</div>
+    </div>
+  </div>
+
+</body>
+</html>

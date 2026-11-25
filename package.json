@@ -1,0 +1,14 @@
+{
+  "name": "fixit-ai",
+  "version": "1.0.0",
+  "description": "FixIt.ai home-services lead site — AI chat + Proaxis + Lead Router",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

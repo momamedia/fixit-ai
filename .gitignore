@@ -1,0 +1,12 @@
+# Secrets — never commit
+.env
+
+# Visitor/customer data — keep private
+fixit-ai/leads.json
+
+# Local tunnels / logs
+*.log
+tunnel-*.log
+
+# Node
+node_modules/

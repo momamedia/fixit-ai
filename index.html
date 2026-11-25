@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Shield Home Services — Home Services Done Right</title>
+  <meta name="description" content="FixIt.ai connects you with trusted local pros for home repairs, remodeling, restoration and more. Chat with our AI to find the right service.">
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Top Shield Home Services — Home Services Done Right">
+  <meta property="og:description" content="Chat with our AI to find the right local pro for your home repair, remodeling, restoration or service need.">
+  <meta property="og:url" content="https://topshield.services/">
+  <meta property="og:site_name" content="Top Shield Home Services">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Top Shield Home Services — Home Services Done Right">
+  <meta name="twitter:description" content="Chat with our AI to find the right local pro for your home repair or service need.">
+  <meta name="twitter:site" content="@TopShieldHS">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff;
+      --bg-alt: #f5f5f7;
+      --text: #1d1d1f;
+      --text-2: #6e6e73;
+      --blue: #0071e3;
+      --blue-dark: #0066cc;
+      --green: #34c759;
+      --line: #d2d2d7;
+      --radius: 18px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); line-height: 1.47; background: var(--bg); font-size: 17px; -webkit-font-smoothing: antialiased; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 3px solid rgba(0,113,227,.5); outline-offset: 2px; border-radius: 6px; }
+    .container { width: min(980px, 88%); margin-inline: auto; }
+
+    /* Sticky mobile call bar (hidden on desktop) */
+    .mobile-call-bar {
+      display: none;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(255,255,255,.95);
+      -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+      border-top: 1px solid var(--line);
+    }
+    .mobile-call-bar a {
+      display: block; width: 100%; text-align: center;
+      background: var(--green); color: #fff; font-weight: 600; font-size: 16px;
+      padding: 13px 0; border-radius: 14px; text-decoration: none;
+    }
+    .mobile-call-bar a:hover { background: #2cb34e; text-decoration: none; }
+
+    /* ===== Nav (frosted) ===== */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px; padding: 0 22px;
+      background: rgba(251,251,253,.8);
+      -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 19px; letter-spacing: -.01em; color: var(--text); }
+    .brand .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--text); display: grid; place-items: center; color: #fff; font-size: .8rem; }
+    .brand em { font-style: normal; color: var(--text-2); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .online { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); font-weight: 500; }
+    .online .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .btn-link { background: var(--blue); border: 0; color: #fff; font-weight: 500; font-size: 13px; cursor: pointer; padding: 6px 14px; border-radius: 980px; font-family: var(--font); }
+    .btn-link:hover { background: var(--blue-dark); text-decoration: none; }
+
+    /* ===== Hero ===== */
+    .hero { background: var(--bg-alt); padding: 56px 0 72px; }
+    .hero .chat-box { position: relative; width: min(860px, 88%); height: 560px; margin: 28px auto 0; display: flex; flex-direction: column; background: var(--bg); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,.07); }
+    .hero-copy { text-align: center; max-width: 820px; margin: 0 auto; padding: 8px 24px 0; }
+    .hero-copy h1 { font-size: clamp(40px, 6.5vw, 72px); line-height: 1.05; font-weight: 600; letter-spacing: -.02em; color: var(--text); margin-bottom: 18px; }
+    .hero-copy h1 .hl { background: linear-gradient(92deg, var(--blue) 10%, #5ac8fa 90%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+    .hero-copy .lead { color: var(--text-2); font-size: 21px; line-height: 1.4; letter-spacing: .01em; max-width: 62ch; margin: 0 auto 32px; }
+    .hero-copy .hero-stats { display: flex; gap: 56px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .hero-copy .stat .num { font-size: 40px; font-weight: 600; letter-spacing: -.02em; color: var(--text); line-height: 1.1; }
+    .hero-copy .stat .lbl { font-size: 14px; color: var(--text-2); }
+
+    /* ===== Sections ===== */
+    section { padding: 110px 0; }
+    .section-head { text-align: center; max-width: 700px; margin: 0 auto 56px; }
+    .section-head h2 { font-size: clamp(32px, 5vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -.02em; color: var(--text); margin-bottom: 14px; }
+    .section-head p { color: var(--text-2); font-size: 19px; line-height: 1.5; }
+
+    /* ===== Services ===== */
+    .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .svc { background: var(--bg-alt); border-radius: var(--radius); padding: 28px 24px; }
+    .svc .icon { display: none; }
+    .svc h4 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+    .svc p { font-size: 15px; color: var(--text-2); line-height: 1.45; }
+    .svc .flag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--blue); background: rgba(0,113,227,.1); padding: 3px 10px; border-radius: 980px; margin-bottom: 10px; }
+
+    .all-services { background: var(--bg-alt); }
+    .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .cat { background: var(--bg); border-radius: var(--radius); padding: 28px; }
+    .cat h3 { font-size: 19px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 16px; }
+    .cat ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 9px 16px; }
+    .cat li { font-size: 14px; color: var(--text-2); position: relative; padding-left: 14px; }
+    .cat li::before { content: ""; position: absolute; left: 0; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+    .cat .more { grid-column: 1 / -1; font-size: 14px; color: var(--text-2); margin-top: 4px; }
+
+    /* ===== How it works ===== */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .step { text-align: left; padding: 30px 26px; border-radius: var(--radius); background: var(--bg-alt); }
+    .step .n { font-size: 15px; font-weight: 600; color: var(--blue); margin-bottom: 12px; }
+    .step h4 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 8px; }
+    .step p { color: var(--text-2); font-size: 15px; line-height: 1.45; }
+
+    /* ===== Value props ===== */
+    .value-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .value { background: var(--bg); border-radius: var(--radius); padding: 28px 24px; }
+    .value .icon { display: none; }
+    .value h4 { font-size: 19px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 8px; }
+    .value p { font-size: 15px; color: var(--text-2); line-height: 1.45; }
+
+    /* ===== AI Chat (Messages-style) ===== */
+    .chat-msgs { flex: 1; min-height: 0; overflow-y: auto; padding: 28px clamp(16px, 3vw, 36px); display: flex; flex-direction: column; gap: 14px; background: var(--bg); }
+    .msg { display: flex; gap: 10px; }
+    .msg .avatar { display: none; }
+    .msg.user { justify-content: flex-end; }
+    .bubble { max-width: 72%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
+    .msg.assistant .bubble { background: var(--bg-alt); color: #000; border-bottom-left-radius: 6px; }
+    .msg.user .bubble { background: var(--blue); color: #fff; border-bottom-right-radius: 6px; }
+    .typing { display: inline-flex; gap: 4px; align-items: center; padding: 2px 0; }
+    .typing i { width: 8px; height: 8px; border-radius: 50%; background: #c7c7cc; animation: blink 1.2s infinite; }
+    .typing i:nth-child(2) { animation-delay: .2s; }
+    .typing i:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100% { opacity: .35; } 40% { opacity: 1; } }
+    .callcard { background: var(--bg-alt); border-radius: 18px; padding: 16px 18px; max-width: 72%; }
+    .callcard h5 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .callcard p { font-size: 14px; color: var(--text-2); margin-bottom: 12px; }
+    .callcard a { display: inline-block; background: var(--blue); color: #fff; font-weight: 500; font-size: 14px; padding: 9px 18px; border-radius: 980px; }
+    .callcard a:hover { background: var(--blue-dark); text-decoration: none; }
+    .callcard.bridge { background: #e9f9ee; }
+    .callcard.bridge h5 { color: #1d7a35; }
+    .callcard.bridge a { background: var(--green); }
+    .callcard.bridge a:hover { background: #2cb34e; }
+    .chat-composer { display: flex; align-items: flex-end; gap: 10px; padding: 14px 18px 18px; border-top: 1px solid rgba(0,0,0,.09); background: var(--bg); }
+    .chat-composer textarea { flex: 1; border: 1px solid var(--line); border-radius: 980px; padding: 11px 20px; font-size: 16px; font-family: inherit; resize: none; max-height: 120px; outline: none; background: var(--bg); color: var(--text); }
+    .chat-composer textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,113,227,.12); }
+    .chat-send { background: var(--blue); color: #fff; border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 17px; cursor: pointer; flex-shrink: 0; }
+    .chat-send:hover { background: var(--blue-dark); }
+    .chat-send:disabled { background: #d8d8dd; color: #fff; }
+
+    /* ===== Reviews ===== */
+    .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .testi { background: var(--bg-alt); border-radius: var(--radius); padding: 30px 26px; }
+    .testi .stars { color: #b0b0b5; letter-spacing: 2px; margin-bottom: 14px; font-size: .9rem; }
+    .testi p { font-size: 16px; margin-bottom: 18px; color: var(--text); }
+    .testi .who { font-weight: 600; color: var(--text); font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .testi .who .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--line); color: var(--text); display: grid; place-items: center; font-size: .8rem; }
+
+    /* ===== Footer ===== */
+    .site-footer { background: var(--bg-alt); color: var(--text-2); padding: 48px 0 34px; font-size: 13px; }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 36px; }
+    .footer-brand .brand { color: var(--text); margin-bottom: 12px; font-size: 17px; }
+    .footer-brand .brand .logo { width: 24px; height: 24px; font-size: .7rem; }
+    .footer-brand p { font-size: 13px; max-width: 32ch; }
+    .site-footer h5 { color: var(--text); font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+    .site-footer ul { list-style: none; display: grid; gap: 9px; }
+    .site-footer ul a { color: var(--text-2); font-size: 13px; }
+    .site-footer ul a:hover { color: var(--text); text-decoration: underline; }
+    .footer-bottom { border-top: 1px solid var(--line); padding-top: 20px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--text-2); }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .typing i { animation: none; opacity: .6; }
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 960px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .value-grid { grid-template-columns: repeat(2, 1fr); }
+      .cats { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      section { padding: 80px 0; }
+    }
+    @media (max-width: 720px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .cats { grid-template-columns: 1fr; }
+      .cat ul { grid-template-columns: 1fr; }
+      .hero { padding: 36px 0 56px; }
+      .hero .chat-box { height: 520px; margin-top: 22px; }
+      .hero-copy { padding-top: 0; }
+      .hero-copy h1 { font-size: 38px; }
+      .hero-copy .lead { font-size: 18px; }
+      .hero-stats { gap: 28px !important; }
+      .hero-copy .stat .num { font-size: 30px; }
+      .bubble { max-width: 86%; }
+      .callcard { max-width: 86%; }
+      .section-head { margin-bottom: 36px; }
+      /* Sticky mobile call bar */
+      .mobile-call-bar { display: flex; }
+      body { padding-bottom: 64px; }
+    }
+  </style>
+</head>
+<body id="top">
+
+  <!-- Header -->
+  <header class="topbar">
+    <a class="brand" href="#top">
+      <span class="logo">🔧</span>
+      <span>Top Shield<em>.home</em></span>
+    </a>
+    <div class="topbar-right">
+      <a href="/guides/index.html" style="font-size:13px;color:var(--text-2);font-weight:500">Guides</a>
+      <span class="online"><span class="dot"></span>AI Assistant</span>
+      <button class="btn-link" id="newChat">+ New chat</button>
+    </div>
+  </header>
+
+  <!-- Hero with the chat -->
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Home services done <span class="hl">right</span>.<br>Fast and vetted.</h1>
+      <p class="lead">Top Shield Home Services connects you with trusted local professionals for repairs, remodeling, restoration, and more. Chat with our AI to get matched — no forms needed.</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="num">4.9★</div><div class="lbl">Average rating</div></div>
+        <div class="stat"><div class="num">15k+</div><div class="lbl">Jobs completed</div></div>
+        <div class="stat"><div class="num">30+</div><div class="lbl">Service categories</div></div>
+      </div>
+    </div>
+    <div class="chat-box" id="chat">
+      <div class="chat-msgs" id="chatBody"></div>
+      <div class="chat-composer">
+        <textarea id="chatText" rows="1" placeholder="Describe what you need…" autocomplete="off"></textarea>
+        <button class="chat-send" id="sendBtn" aria-label="Send">➤</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular services -->
+  <section id="services">
+    <div class="container">
+      <div class="section-head">
+        <h2>Popular home services</h2>
+        <p>A few of the most-requested jobs — and with 70+ specialties, we've got the rest covered too.</p>
+      </div>
+      <div class="services-grid">
+        <div class="svc"><div class="icon">🛠️</div><h4>Garage Door Repair</h4><p>Springs, openers, panels &amp; full replacements.</p></div>
+        <div class="svc"><div class="icon">🛁</div><h4>Bath Remodeling</h4><p>Full bathroom renovations, tile, tubs &amp; showers.</p></div>
+        <div class="svc"><div class="icon">💧</div><h4>Water Damage Restoration</h4><span class="flag">24/7 emergency</span><p>Extraction, drying, mold prevention &amp; rebuild.</p></div>
+        <div class="svc"><div class="icon">🔐</div><h4>Locksmith</h4><p>Locks, keys, rekeying &amp; emergency access.</p></div>
+        <div class="svc"><div class="icon">🍳</div><h4>Kitchen Remodeling</h4><p>Cabinets, counters, backsplash &amp; appliances.</p></div>
+        <div class="svc"><div class="icon">🌳</div><h4>Landscaping</h4><p>Tree service, lawn care, hardscape &amp; more.</p></div>
+        <div class="svc"><div class="icon">❄️</div><h4>HVAC Installation</h4><p>Heating &amp; cooling installs, repairs, ductwork.</p></div>
+        <div class="svc"><div class="icon">⚡</div><h4>Electrical &amp; Panels</h4><p>Breaker replacement, wiring, EV chargers.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- All services -->
+  <section class="all-services" id="all-services">
+    <div class="container">
+      <div class="section-head">
+        <h2>Every service, one call</h2>
+        <p>If it's in or around your home, we can probably help. Here's the full lineup.</p>
+      </div>
+      <div class="cats">
+        <div class="cat">
+          <h3>Remodeling &amp; Construction</h3>
+          <ul>
+            <li>Kitchen remodeling</li><li>Bath remodeling</li><li>Basement finishing</li><li>ADU buildouts</li>
+            <li>Home remodeling (masonry)</li><li>New construction</li><li>Carpentry</li><li>Demolition</li>
+            <li>Deck building</li><li>Fence installation</li><li>Foundation</li><li>Drywall repair</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <h3>Emergency &amp; Restoration</h3>
+          <ul>
+            <li>Water damage restoration</li><li>Fire damage restoration</li><li>Mold remediation</li>
+            <li>Sewage cleanup</li><li>Biohazard cleanup</li><li>Crime scene cleanup</li>
+            <li>Asbestos removal</li><li>Asbestos testing</li><li>Sliding door repair</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <h3>HVAC, Electrical &amp; Security</h3>
+          <ul>
+            <li>HVAC installation</li><li>Air duct cleaning</li><li>Air duct replacement</li><li>Breaker replacement</li>
+            <li>EV charger installation</li><li>Home security systems</li><li>Security cameras</li>
+            <li>Access control</li><li>Solar panel installation</li><li>Telecom services</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <h3>Cleaning &amp; Maintenance</h3>
+          <ul>
+            <li>Cleaning services</li><li>Carpet cleaning</li><li>Upholstery cleaning</li>
+            <li>Chimney cleaning</li><li>Dryer vent cleaning</li><li>Pressure washing</li>
+            <li>Window treatments</li><li>Interior painting</li><li>Exterior painting</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <h3>Moving &amp; Outdoor</h3>
+          <ul>
+            <li>Local moving</li><li>Long distance moving</li><li>Junk removal</li>
+            <li>Landscaping (tree service)</li><li>Concrete driveway</li><li>Artificial turf</li>
+            <li>Siding install / repair</li><li>Stucco service</li><li>Impact windows</li>
+            <li>Pergolas &amp; outdoor shade</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <h3>Specialty &amp; More</h3>
+          <ul>
+            <li>Garage door repair</li><li>Locksmith</li><li>Gate services</li><li>Pool remodeling</li>
+            <li>Sliding door installation</li><li>Fireplace repair</li><li>Septic tank services</li>
+            <li>Portable toilets</li><li>Wildlife removal</li><li>Auto repair</li>
+            <li>Insulation</li><li>Spray foam insulation</li>
+          </ul>
+          <p class="more">Don't see it? Ask — we'll find a pro.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how">
+    <div class="container">
+      <div class="section-head">
+        <h2>How it works</h2>
+        <p>From request to done, in three steps.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><h4>Tell us what you need</h4><p>Chat with our AI and describe your project or pick a service.</p></div>
+        <div class="step"><div class="n">2</div><h4>Get matched &amp; quoted</h4><p>We connect you with a vetted local pro and get you a fast, free quote.</p></div>
+        <div class="step"><div class="n">3</div><h4>Sit back &amp; relax</h4><p>Your pro handles the job. We're here if you need anything.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value props -->
+  <section class="all-services" id="why">
+    <div class="container">
+      <div class="section-head">
+        <h2>Why homeowners choose us</h2>
+      </div>
+      <div class="value-grid">
+        <div class="value"><div class="icon">✅</div><h4>Vetted pros</h4><p>Every pro is background-checked, licensed, and rated.</p></div>
+        <div class="value"><div class="icon">💰</div><h4>Free quotes</h4><p>Get a clear, upfront price — no surprises.</p></div>
+        <div class="value"><div class="icon">⚡</div><h4>Fast matching</h4><p>Most customers are matched within minutes.</p></div>
+        <div class="value"><div class="icon">🛡️</div><h4>Workmanship backed</h4><p>We stand behind the work on your home.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <h2>Trusted by neighbors</h2>
+      </div>
+      <div class="testi-grid">
+        <div class="testi">
+          <div class="stars">★★★★★</div>
+          <p>"Booked a bathroom remodel on a Tuesday and the crew started that Friday. Professional, clean, and the quote was exactly what we paid."</p>
+          <div class="who"><span class="avatar">MH</span> Maria H. — Bath remodeling</div>
+        </div>
+        <div class="testi">
+          <div class="stars">★★★★★</div>
+          <p>"Water damage in the basement was overwhelming. FixIt.ai matched us with a restoration team in under an hour. Absolute lifesavers."</p>
+          <div class="who"><span class="avatar">JT</span> James T. — Water damage</div>
+        </div>
+        <div class="testi">
+          <div class="stars">★★★★★</div>
+          <p>"The electrician swapped our breaker panel and installed an EV charger. On time, tidy, fairly priced. Will absolutely use again."</p>
+          <div class="who"><span class="avatar">AK</span> Aisha K. — Electrical</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top">
+            <span class="logo">🔧</span>
+            <span>Top Shield<em>.home</em></span>
+          </a>
+          <p>Home services done right. Fast, vetted, and backed by real workmanship.</p>
+          <p style="margin-top:10px;font-size:13px;line-height:1.5">Top Shield Home Services<br>6920 S Cimarron Rd, Suite 100<br>Las Vegas, NV 89113, USA</p>
+        </div>
+        <div>
+          <h5>Services</h5>
+          <ul>
+            <li><a href="#all-services">Remodeling</a></li>
+            <li><a href="#all-services">Restoration</a></li>
+            <li><a href="#all-services">HVAC &amp; Electrical</a></li>
+            <li><a href="#all-services">Cleaning</a></li>
+            <li><a href="/guides/index.html">How-to Guides</a></li>
+            <li><a href="#top">Talk to the AI</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#why">Why us</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#">Join as a pro</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Get help</h5>
+          <ul>
+            <li><a href="#chat">Chat with our AI</a></li>
+            <li><a href="/guides/index.html">How-to Guides</a></li>
+            <li><a href="/privacy.html">Privacy Policy</a></li>
+            <li><a href="/terms.html">Terms of Service</a></li>
+            <li><a href="#chat">Find the right service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Top Shield Home Services. All rights reserved.</span>
+        <span><a href="/privacy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="/terms.html">Terms of Service</a></span>
+      </div>
+      <div class="footer-bottom" style="border-top:0;padding-top:10px;justify-content:center;text-align:center;">
+        <span>Top Shield Home Services<br>6920 S Cimarron Rd, Suite 100<br>Las Vegas, NV 89113, USA</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky mobile call bar (visible only on small screens) — routes to chat -->
+  <div class="mobile-call-bar">
+    <a href="#chat" id="mobileChatBtn">💬 Talk to the AI</a>
+  </div>
+
+  <script>
+    // ===== AI chat (integrated section) =====
+    (function () {
+      var bodyEl = document.getElementById('chatBody');
+      var text = document.getElementById('chatText');
+      var sendBtn = document.getElementById('sendBtn');
+      var newChat = document.getElementById('newChat');
+      var convo = [];
+
+      function addMsg(kind, content) {
+        var row = document.createElement('div');
+        row.className = 'msg ' + kind;
+        var avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.textContent = kind === 'assistant' ? '🤖' : '🙂';
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (kind === 'assistant' && typeof content === 'object') bubble.appendChild(content);
+        else bubble.textContent = content;
+        row.appendChild(avatar); row.appendChild(bubble);
+        bodyEl.appendChild(row);
+        bodyEl.scrollTop = bodyEl.scrollHeight;
+        return row;
+      }
+
+      function typingIndicator() {
+        var el = document.createElement('span');
+        el.className = 'typing';
+        el.innerHTML = '<i></i><i></i><i></i>';
+        return el;
+      }
+
+      function addCallCard(service, servicePhone) {
+        if (!servicePhone || !servicePhone.e164) return null;
+        var el = document.createElement('div');
+        el.className = 'callcard';
+        el.innerHTML =
+          '<h5>Who to call</h5>' +
+          '<p>The ' + service + ' team at FixIt.ai can help you.</p>' +
+          '<a href="tel:' + servicePhone.e164 + '">📞 Call ' + servicePhone.display + '</a>';
+        bodyEl.appendChild(el);
+        bodyEl.scrollTop = bodyEl.scrollHeight;
+        return el;
+      }
+
+      function updateCallCardNumber(el, servicePhone) {
+        if (!el || !servicePhone || !servicePhone.e164) return;
+        var a = el.querySelector('a');
+        if (a) { a.href = 'tel:' + servicePhone.e164; a.textContent = '📞 Call ' + servicePhone.display; }
+      }
+
+      function addCallNowCard(service, callNow) {
+        var el = document.createElement('div');
+        el.className = 'callcard bridge';
+        var bid = callNow.bid ? ' (bid $' + Number(callNow.bid).toFixed(2) + ')' : '';
+        el.innerHTML =
+          '<h5>✅ You\'re matched with a ' + (service || 'home service') + ' pro!</h5>' +
+          '<p>Tap below to be connected now.' + bid + '</p>' +
+          '<a href="tel:' + callNow.phone + '">📞 Call now</a>';
+        bodyEl.appendChild(el);
+        bodyEl.scrollTop = bodyEl.scrollHeight;
+      }
+
+      function send(message) {
+        convo.push({ role: 'user', content: message });
+        addMsg('user', message);
+        var t = addMsg('assistant', typingIndicator());
+        var cardEl = null;
+        sendBtn.disabled = true;
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: convo })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          t.remove();
+          convo.push({ role: 'assistant', content: data.reply });
+          addMsg('assistant', data.reply);
+          if (data.service) cardEl = addCallCard(data.service, data.servicePhone);
+          if (data.callNow && data.callNow.phone) addCallNowCard(data.service, data.callNow);
+          // If qualified, replace the static number with a unique DNI number.
+          if (data.complete && data.service && !data.callNow) {
+            var visitorId = (window.__visitorId || (window.__visitorId = 'v' + Date.now() + Math.random().toString(36).slice(2, 8)));
+            fetch('/api/dni?service=' + encodeURIComponent(data.service) + '&visitorId=' + encodeURIComponent(visitorId))
+              .then(function (r) { return r.json(); })
+              .then(function (dni) {
+                if (dni.ok) updateCallCardNumber(cardEl, { e164: dni.e164, display: dni.display });
+              })
+              .catch(function () {});
+          }
+          sendBtn.disabled = false;
+          text.focus();
+        })
+        .catch(function () {
+          t.remove();
+          addMsg('assistant', 'Sorry, I had trouble reaching my assistant. Please try again in a moment.');
+          sendBtn.disabled = false;
+        });
+        text.value = '';
+        text.style.height = 'auto';
+      }
+
+      function resetChat() {
+        convo = [];
+        bodyEl.innerHTML = '';
+        addMsg('assistant', "Hi! I'm the FixIt.ai assistant. What’s going on around your home, and how can I help?");
+      }
+
+      text.addEventListener('input', function () {
+        text.style.height = 'auto';
+        text.style.height = Math.min(text.scrollHeight, 120) + 'px';
+      });
+      text.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); var v = text.value.trim(); if (v) send(v); }
+      });
+      sendBtn.addEventListener('click', function () { var v = text.value.trim(); if (v) send(v); });
+      newChat.addEventListener('click', resetChat);
+
+      resetChat();
+
+      // Footer year + smooth scroll for the "Talk to the AI" buttons
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

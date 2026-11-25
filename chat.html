@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Shield Assistant — Top Shield Home Services</title>
+  <meta name="description" content="Chat with Top Shield Home Services' AI assistant to find the right home service. Get connected to a pro fast.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff;
+      --bg-alt: #f5f5f7;
+      --text: #1d1d1f;
+      --text-2: #6e6e73;
+      --blue: #0071e3;
+      --blue-dark: #0066cc;
+      --green: #34c759;
+      --line: #d2d2d7;
+      --radius: 18px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    html, body { height: 100%; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); display: flex; flex-direction: column; font-size: 17px; -webkit-font-smoothing: antialiased; }
+    :focus-visible { outline: 3px solid rgba(0,113,227,.5); outline-offset: 2px; border-radius: 6px; }
+
+    /* ===== Nav (frosted) ===== */
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px; padding: 0 22px; flex-shrink: 0;
+      background: rgba(251,251,253,.8);
+      -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 19px; letter-spacing: -.01em; color: var(--text); text-decoration: none; }
+    .brand .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--text); display: grid; place-items: center; color: #fff; font-size: .8rem; }
+    .brand em { font-style: normal; color: var(--text-2); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .online { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); font-weight: 500; }
+    .online .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .btn-link { background: var(--blue); border: 0; color: #fff; font-weight: 500; font-size: 13px; cursor: pointer; padding: 6px 14px; border-radius: 980px; font-family: var(--font); }
+    .btn-link:hover { background: var(--blue-dark); }
+
+    /* ===== Chat area ===== */
+    .chat-wrap { flex: 1; overflow-y: auto; }
+    .chat-scroll { max-width: 820px; margin: 0 auto; padding: 28px 20px 44px; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 32vh 0 0; }
+    .empty-state .spark { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 16px; background: var(--bg-alt); display: grid; place-items: center; font-size: 26px; }
+    .empty-state h1 { font-size: clamp(34px, 5vw, 52px); line-height: 1.06; font-weight: 600; letter-spacing: -.02em; color: var(--text); margin-bottom: 10px; }
+    .empty-state p { color: var(--text-2); font-size: 19px; margin-bottom: 34px; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .sug { background: var(--bg-alt); border: 0; border-radius: var(--radius); padding: 13px 18px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; max-width: 300px; font-family: var(--font); }
+    .sug:hover { background: #e8e8ed; }
+    .sug .s { display: block; font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 3px; }
+    .sug .d { font-size: 13px; color: var(--text-2); }
+
+    /* Messages */
+    .msgs { display: flex; flex-direction: column; gap: 18px; }
+    .msg { display: flex; gap: 10px; }
+    .msg .avatar { display: none; }
+    .msg.user { justify-content: flex-end; }
+    .bubble { max-width: 72%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
+    .msg.assistant .bubble { background: var(--bg-alt); color: #000; border-bottom-left-radius: 6px; }
+    .msg.user .bubble { background: var(--blue); color: #fff; border-bottom-right-radius: 6px; }
+
+    /* Typing dots */
+    .typing { display: inline-flex; gap: 4px; align-items: center; padding: 2px 0; }
+    .typing i { width: 8px; height: 8px; border-radius: 50%; background: #c7c7cc; animation: blink 1.2s infinite; }
+    .typing i:nth-child(2) { animation-delay: .2s; }
+    .typing i:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100% { opacity: .35; } 40% { opacity: 1; } }
+
+    /* Call card */
+    .callcard { margin-top: 6px; max-width: 72%; background: var(--bg-alt); border-radius: 18px; padding: 16px 18px; }
+    .callcard h5 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .callcard p { font-size: 14px; color: var(--text-2); margin-bottom: 12px; }
+    .callcard a { display: inline-block; background: var(--blue); color: #fff; font-weight: 500; font-size: 14px; padding: 9px 18px; border-radius: 980px; text-decoration: none; }
+    .callcard a:hover { background: var(--blue-dark); text-decoration: none; }
+    .callcard.bridge { background: #e9f9ee; }
+    .callcard.bridge h5 { color: #1d7a35; }
+    .callcard.bridge a { background: var(--green); }
+    .callcard.bridge a:hover { background: #2cb34e; }
+
+    /* ===== Composer ===== */
+    .composer-wrap { position: sticky; bottom: 0; background: linear-gradient(to top, var(--bg) 72%, rgba(255,255,255,0)); padding: 22px 16px 18px; }
+    .composer { max-width: 820px; margin: 0 auto; }
+    form.composer-box { display: flex; align-items: flex-end; gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 980px; padding: 8px 8px 8px 20px; box-shadow: 0 2px 14px rgba(0,0,0,.05); }
+    form.composer-box:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,113,227,.12); }
+    .composer textarea { flex: 1; border: 0; outline: 0; resize: none; font-family: inherit; font-size: 16px; color: var(--text); background: transparent; max-height: 140px; line-height: 1.5; padding: 10px 0; }
+    .composer textarea::placeholder { color: #a1a1a6; }
+    .send { background: var(--blue); color: #fff; border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 17px; cursor: pointer; flex-shrink: 0; display: grid; place-items: center; }
+    .send:hover { background: var(--blue-dark); }
+    .send:disabled { background: #d8d8dd; color: #fff; cursor: default; }
+    .composer-note { text-align: center; font-size: 12px; color: #a1a1a6; margin-top: 12px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .typing i { animation: none; opacity: .6; }
+    }
+    @media (max-width: 720px) {
+      .empty-state { padding-top: 20vh; }
+      .empty-state h1 { font-size: 34px; }
+      .bubble { max-width: 86%; }
+      .callcard { max-width: 86%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="logo">🔧</span>
+      <span>Top Shield<em>.home</em></span>
+    </a>
+    <div class="topbar-right">
+      <a href="/guides/index.html" style="font-size:13px;color:var(--text-2);font-weight:500">Guides</a>
+      <span class="online"><span class="dot"></span>AI Assistant</span>
+      <button class="btn-link" id="newChat">+ New chat</button>
+    </div>
+  </header>
+
+  <!-- Chat scroll area -->
+  <main class="chat-wrap">
+    <div class="chat-scroll">
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="spark">🤖</div>
+        <h1>What can I help you with?</h1>
+        <p>Describe what you need around your home — I'll point you to the right service.</p>
+        <div class="suggestions">
+          <button class="sug" data-c="My garage door won't open."><span class="s">Garage door won't open</span><span class="d">Repair / replacement</span></button>
+          <button class="sug" data-c="I have water damage in my basement."><span class="s">Water damage</span><span class="d">Restoration &amp; drying</span></button>
+          <button class="sug" data-c="I'd like to remodel my bathroom."><span class="s">Bathroom remodel</span><span class="d">Remodeling</span></button>
+          <button class="sug" data-c="I'm locked out of my house."><span class="s">Locked out</span><span class="d">Emergency locksmith</span></button>
+          <button class="sug" data-c="My AC isn't cooling."><span class="s">AC not cooling</span><span class="d">HVAC service</span></button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="msgs" id="msgs" hidden></div>
+    </div>
+  </main>
+
+  <!-- Composer -->
+  <div class="composer-wrap">
+    <div class="composer">
+      <form class="composer-box" id="chatForm">
+        <textarea id="chatText" rows="1" placeholder="Describe what you need…" autocomplete="off"></textarea>
+        <button type="submit" class="send" id="sendBtn" aria-label="Send">➤</button>
+      </form>
+      <p class="composer-note">Top Shield Home Services AI assistant — can make mistakes; confirm important details.</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var emptyState = document.getElementById('emptyState');
+      var msgs = document.getElementById('msgs');
+      var form = document.getElementById('chatForm');
+      var text = document.getElementById('chatText');
+      var sendBtn = document.getElementById('sendBtn');
+      var newChat = document.getElementById('newChat');
+
+      var convo = [];
+
+      function showChat() {
+        emptyState.hidden = false;
+        msgs.hidden = true;
+      }
+      function showMsgs() {
+        emptyState.hidden = true;
+        msgs.hidden = false;
+      }
+
+      function addMsg(kind, content) {
+        showMsgs();
+        var row = document.createElement('div');
+        row.className = 'msg ' + kind;
+
+        var avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.textContent = kind === 'assistant' ? '🤖' : '🙂';
+
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (kind === 'assistant' && typeof content === 'object') {
+          bubble.appendChild(content); // typing indicator or call card
+        } else {
+          bubble.textContent = content;
+        }
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        msgs.appendChild(row);
+        scrollToBottom();
+        return row;
+      }
+
+      function typingIndicator() {
+        var el = document.createElement('span');
+        el.className = 'typing';
+        el.innerHTML = '<i></i><i></i><i></i>';
+        return el;
+      }
+
+      function addCallCard(service, servicePhone) {
+        if (!servicePhone || !servicePhone.e164) return;
+        showMsgs();
+        var card = document.createElement('div');
+        card.className = 'callcard';
+        card.innerHTML =
+          '<h5>Who to call</h5>' +
+          '<p>The ' + service + ' team at Top Shield Home Services can help you.</p>' +
+          '<a href="tel:' + servicePhone.e164 + '">📞 Call ' + servicePhone.display + '</a>';
+        var row = document.createElement('div');
+        row.className = 'msg assistant';
+        var avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '🤖';
+        row.appendChild(avatar); row.appendChild(card);
+        msgs.appendChild(row);
+        scrollToBottom();
+      }
+
+      // "Call now" card shown when Proaxis accepts a lead and returns a
+      // bridge number the visitor can be connected to immediately.
+      function addCallNowCard(service, callNow) {
+        showMsgs();
+        var card = document.createElement('div');
+        card.className = 'callcard bridge';
+        var bid = callNow.bid ? ' (bid $' + Number(callNow.bid).toFixed(2) + ')' : '';
+        card.innerHTML =
+          '<h5>✅ You\'re matched with a ' + (service || 'home service') + ' pro!</h5>' +
+          '<p>Tap below to be connected now.' + bid + '</p>' +
+          '<a href="tel:' + callNow.phone + '">📞 Call now</a>';
+        var row = document.createElement('div');
+        row.className = 'msg assistant';
+        var avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✅';
+        row.appendChild(avatar); row.appendChild(card);
+        msgs.appendChild(row);
+        scrollToBottom();
+      }
+
+      function scrollToBottom() {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+
+      function setTyping(on) {
+        sendBtn.disabled = on;
+      }
+
+      function send(message) {
+        convo.push({ role: 'user', content: message });
+        var userRow = addMsg('user', message);
+        var row = addMsg('assistant', typingIndicator());
+        setTyping(true);
+
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: convo })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          row.remove();
+          convo.push({ role: 'assistant', content: data.reply });
+          addMsg('assistant', data.reply);
+          if (data.service) addCallCard(data.service, data.servicePhone);
+          if (data.callNow && data.callNow.phone) addCallNowCard(data.service, data.callNow);
+          setTyping(false);
+          text.focus();
+        })
+        .catch(function () {
+          row.remove();
+          addMsg('assistant', 'Sorry, I had trouble reaching my assistant. Please try again in a moment.');
+          setTyping(false);
+        });
+
+        text.value = '';
+        text.style.height = 'auto';
+      }
+
+      function resetChat() {
+        convo = [];
+        msgs.innerHTML = '';
+        showChat();
+      }
+
+      // Auto-grow textarea
+      text.addEventListener('input', function () {
+        text.style.height = 'auto';
+        text.style.height = Math.min(text.scrollHeight, 140) + 'px';
+      });
+
+      // Enter to send, Shift+Enter for newline
+      text.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          var v = text.value.trim();
+          if (v) send(v);
+        }
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = text.value.trim();
+        if (v) send(v);
+      });
+
+      // Suggestion buttons (empty state)
+      document.querySelectorAll('.sug').forEach(function (b) {
+        b.addEventListener('click', function () { send(b.getAttribute('data-c')); });
+      });
+
+      newChat.addEventListener('click', resetChat);
+    })();
+  </script>
+</body>
+</html>
