@@ -1,0 +1,21 @@
+<svg width="400" height="240" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e6f0f5"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#bg)"/>
+  <circle cx="60" cy="55" r="60" fill="#e0edf5"/>
+  <circle cx="340" cy="185" r="50" fill="#ebf2f8"/>
+  <rect x="150" y="70" width="100" height="110" rx="12" fill="#ffffff" stroke="#b7c6d6" stroke-width="4"/>
+  <rect x="160" y="82" width="80" height="40" rx="6" fill="#eef3f8"/>
+  <line x1="160" y1="102" x2="240" y2="102" stroke="#b7c6d6" stroke-width="3"/>
+  <rect x="160" y="132" width="80" height="36" rx="6" fill="#dce7f2"/>
+  <line x1="175" y1="150" x2="225" y2="150" stroke="#a8bccf" stroke-width="4"/>
+  <g transform="translate(310,84)">
+    <g stroke="#5ac8fa" stroke-width="5" stroke-linecap="round">
+      <line x1="0" y1="-34" x2="0" y2="34"/><line x1="-34" y1="0" x2="34" y2="0"/>
+      <line x1="-24" y1="-24" x2="24" y2="24"/><line x1="24" y1="-24" x2="-24" y2="24"/>
+    </g>
+  </g>
+</svg>

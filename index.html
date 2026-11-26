@@ -116,11 +116,29 @@
 
     /* ===== Services ===== */
     .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .svc { background: var(--bg-alt); border-radius: var(--radius); padding: 28px 24px; }
+    .svc { border-radius: var(--radius); padding: 28px 24px; position: relative; overflow: hidden; background-size: cover; background-position: center top; }
     .svc .icon { display: none; }
-    .svc h4 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+    .svc h3 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
     .svc p { font-size: 15px; color: var(--text-2); line-height: 1.45; }
     .svc .flag { display: inline-block; font-size: 12px; font-weight: 700; color: #0056b3; background: rgba(0,113,227,.1); padding: 3px 10px; border-radius: 980px; margin-bottom: 10px; }
+    /* Background illustrations for each service (flat SVG art behind the content) */
+    .svc.il { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/garage-door.svg'); }
+    .svc.il.garage { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/garage-door.svg'); }
+    .svc.il.water { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/water-damage.svg'); }
+    .svc.il.locksmith { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/locksmith.svg'); }
+    .svc.il.hvac { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/hvac.svg'); }
+    .svc.il.electrical { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/electrical.svg'); }
+    .svc.il.windows { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/windows.svg'); }
+    .svc.il.pest { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/pest-control.svg'); }
+    .svc.il.gutters { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/gutters.svg'); }
+    .svc.il.roofing { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/roofing.svg'); }
+    .svc.il.siding { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/siding.svg'); }
+    .svc.il.mold { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/mold-removal.svg'); }
+    .svc.il.dumpster { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/dumpster.svg'); }
+    .svc.il.toilet { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/portable-toilet.svg'); }
+    .svc.il.handyman { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/handyman.svg'); }
+    .svc.il.appliance { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/appliance-repair.svg'); }
+    .svc.il.plumbing { background-image: linear-gradient(rgba(255,255,255,.70), rgba(255,255,255,.94)), url('/images/services/plumbing.svg'); }
     /* Service cards that have a direct phone number / can be called */
     .svc.callable { position: relative; }
     .svc.callable::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--green); border-radius: var(--radius) var(--radius) 0 0; }
@@ -274,22 +292,22 @@
         <p>Our full lineup of callable home services — everything we can connect you with right now.</p>
       </div>
       <div class="services-grid">
-        <div class="svc callable"><div class="icon">🛠️</div><h3>Garage Door Repair</h3><p>Springs, openers, panels &amp; full replacements.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">💧</div><h3>Water Damage Restoration</h3><span class="flag">24/7 emergency</span><p>Extraction, drying, mold prevention &amp; rebuild.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🔐</div><h3>Locksmith</h3><p>Locks, keys, rekeying &amp; emergency access.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">❄️</div><h3>HVAC Installation</h3><p>Heating &amp; cooling installs, repairs, ductwork.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">⚡</div><h3>Electrical &amp; Panels</h3><p>Breaker replacement, wiring, EV chargers.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🪟</div><h3>Window Installation</h3><p>New windows, replacement, impact glass.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🐜</div><h3>Pest Control</h3><p>Rodents, insects, wildlife &amp; exclusion.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🌧️</div><h3>Gutter Services</h3><p>Cleaning, guards, repairs &amp; downspouts.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🏚️</div><h3>Roofing</h3><p>Repairs, replacement, shingles &amp; leaks.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🧱</div><h3>Siding</h3><p>Vinyl, fiber-cement, repairs &amp; install.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🦠</div><h3>Mold Removal</h3><p>Remediation, testing &amp; prevention.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🗑️</div><h3>Dumpster Rental</h3><p>Roll-off dumpsters &amp; junk removal.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🚽</div><h3>Portable Toilets</h3><p>Restroom rental for events &amp; sites.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🔨</div><h3>Handyman</h3><p>Odd jobs, assembly &amp; small repairs.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🔌</div><h3>Appliance Repair</h3><p>Dishwasher, fridge, washer &amp; dryer.</p><span class="call-badge">📞 Call available</span></div>
-        <div class="svc callable"><div class="icon">🚿</div><h3>Plumbing</h3><p>Leaks, drains, water heaters &amp; pipes.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il garage"><div class="icon">🛠️</div><h3>Garage Door Repair</h3><p>Springs, openers, panels &amp; full replacements.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il water"><div class="icon">💧</div><h3>Water Damage Restoration</h3><span class="flag">24/7 emergency</span><p>Extraction, drying, mold prevention &amp; rebuild.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il locksmith"><div class="icon">🔐</div><h3>Locksmith</h3><p>Locks, keys, rekeying &amp; emergency access.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il hvac"><div class="icon">❄️</div><h3>HVAC Installation</h3><p>Heating &amp; cooling installs, repairs, ductwork.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il electrical"><div class="icon">⚡</div><h3>Electrical &amp; Panels</h3><p>Breaker replacement, wiring, EV chargers.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il windows"><div class="icon">🪟</div><h3>Window Installation</h3><p>New windows, replacement, impact glass.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il pest"><div class="icon">🐜</div><h3>Pest Control</h3><p>Rodents, insects, wildlife &amp; exclusion.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il gutters"><div class="icon">🌧️</div><h3>Gutter Services</h3><p>Cleaning, guards, repairs &amp; downspouts.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il roofing"><div class="icon">🏚️</div><h3>Roofing</h3><p>Repairs, replacement, shingles &amp; leaks.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il siding"><div class="icon">🧱</div><h3>Siding</h3><p>Vinyl, fiber-cement, repairs &amp; install.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il mold"><div class="icon">🦠</div><h3>Mold Removal</h3><p>Remediation, testing &amp; prevention.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il dumpster"><div class="icon">🗑️</div><h3>Dumpster Rental</h3><p>Roll-off dumpsters &amp; junk removal.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il toilet"><div class="icon">🚽</div><h3>Portable Toilets</h3><p>Restroom rental for events &amp; sites.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il handyman"><div class="icon">🔨</div><h3>Handyman</h3><p>Odd jobs, assembly &amp; small repairs.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il appliance"><div class="icon">🔌</div><h3>Appliance Repair</h3><p>Dishwasher, fridge, washer &amp; dryer.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable il plumbing"><div class="icon">🚿</div><h3>Plumbing</h3><p>Leaks, drains, water heaters &amp; pipes.</p><span class="call-badge">📞 Call available</span></div>
       </div>
     </div>
   </section>
