@@ -121,6 +121,10 @@
     .svc h4 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
     .svc p { font-size: 15px; color: var(--text-2); line-height: 1.45; }
     .svc .flag { display: inline-block; font-size: 12px; font-weight: 700; color: #0056b3; background: rgba(0,113,227,.1); padding: 3px 10px; border-radius: 980px; margin-bottom: 10px; }
+    /* Service cards that have a direct phone number / can be called */
+    .svc.callable { position: relative; }
+    .svc.callable::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--green); border-radius: var(--radius) var(--radius) 0 0; }
+    .call-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 12px; font-size: 12px; font-weight: 700; color: #0b6b2f; background: rgba(52,199,89,.15); padding: 4px 11px; border-radius: 980px; }
 
     .all-services { background: var(--bg-alt); }
     .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -270,14 +274,14 @@
         <p>A few of the most-requested jobs — and with 70+ specialties, we've got the rest covered too.</p>
       </div>
       <div class="services-grid">
-        <div class="svc"><div class="icon">🛠️</div><h3>Garage Door Repair</h3><p>Springs, openers, panels &amp; full replacements.</p></div>
+        <div class="svc callable"><div class="icon">🛠️</div><h3>Garage Door Repair</h3><p>Springs, openers, panels &amp; full replacements.</p><span class="call-badge">📞 Call available</span></div>
         <div class="svc"><div class="icon">🛁</div><h3>Bath Remodeling</h3><p>Full bathroom renovations, tile, tubs &amp; showers.</p></div>
-        <div class="svc"><div class="icon">💧</div><h3>Water Damage Restoration</h3><span class="flag">24/7 emergency</span><p>Extraction, drying, mold prevention &amp; rebuild.</p></div>
-        <div class="svc"><div class="icon">🔐</div><h3>Locksmith</h3><p>Locks, keys, rekeying &amp; emergency access.</p></div>
+        <div class="svc callable"><div class="icon">💧</div><h3>Water Damage Restoration</h3><span class="flag">24/7 emergency</span><p>Extraction, drying, mold prevention &amp; rebuild.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable"><div class="icon">🔐</div><h3>Locksmith</h3><p>Locks, keys, rekeying &amp; emergency access.</p><span class="call-badge">📞 Call available</span></div>
         <div class="svc"><div class="icon">🍳</div><h3>Kitchen Remodeling</h3><p>Cabinets, counters, backsplash &amp; appliances.</p></div>
         <div class="svc"><div class="icon">🌳</div><h3>Landscaping</h3><p>Tree service, lawn care, hardscape &amp; more.</p></div>
-        <div class="svc"><div class="icon">❄️</div><h3>HVAC Installation</h3><p>Heating &amp; cooling installs, repairs, ductwork.</p></div>
-        <div class="svc"><div class="icon">⚡</div><h3>Electrical &amp; Panels</h3><p>Breaker replacement, wiring, EV chargers.</p></div>
+        <div class="svc callable"><div class="icon">❄️</div><h3>HVAC Installation</h3><p>Heating &amp; cooling installs, repairs, ductwork.</p><span class="call-badge">📞 Call available</span></div>
+        <div class="svc callable"><div class="icon">⚡</div><h3>Electrical &amp; Panels</h3><p>Breaker replacement, wiring, EV chargers.</p><span class="call-badge">📞 Call available</span></div>
       </div>
     </div>
   </section>
