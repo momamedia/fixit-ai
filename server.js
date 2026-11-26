@@ -1,5 +1,5 @@
 /**
- * FixIt.ai — visitor AI chat + lead capture backend.
+ * Top Shield Home Services - visitor AI chat + lead capture backend.
  *
  * Run with Node (v18+):
  *   node server.js
@@ -840,7 +840,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       try {
-        const body = JSON.stringify({ specToken, visitorId: visitorId || undefined, url: 'https://fixit.ai/' });
+        const body = JSON.stringify({ specToken, visitorId: visitorId || undefined, url: 'https://topshieldhome.com/' });
         const lr = await fetch(CFG.leadrouterEndpoint + '/api/public/dni/impressions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
