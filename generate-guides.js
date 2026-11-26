@@ -456,12 +456,28 @@ footer{text-align:center;color:var(--text-2);font-size:13px;padding:30px 0;backg
 
 function main() {
   fs.mkdirSync(OUT, { recursive: true });
+
+  // Merge optional expansion data (extra topics per vertical + new verticals) from
+  // guides-extra.json if present. Keeps the base generator stable and data-driven.
+  let extra = {};
+  try {
+    extra = JSON.parse(fs.readFileSync(path.join(ROOT, 'guides-extra.json'), 'utf8'));
+  } catch (e) { /* no expansion file, continue with base only */ }
+
+  if (extra.extraTopics && typeof extra.extraTopics === 'object') {
+    for (const v of verticals) {
+      const add = extra.extraTopics[v.slug];
+      if (Array.isArray(add) && add.length) v.topics.push(...add);
+    }
+  }
+  if (Array.isArray(extra.newVerticals)) verticals.push(...extra.newVerticals);
+
   const verticalData = [];
   let totalPages = 0;
   for (const v of verticals) {
     const dir = path.join(OUT, v.slug);
     fs.mkdirSync(dir, { recursive: true });
-    const topics = v.topics.slice(0, 65);
+    const topics = v.topics.slice(0, 80);
     const pages = topics.map((t, i) => {
       const rawTitle = t.startsWith('How to') ? t : `How to ${t}`;
       const slug = slugify(rawTitle);
