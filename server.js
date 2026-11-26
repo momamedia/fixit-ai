@@ -975,6 +975,16 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ error: 'no_spec_for_service' }));
         return;
       }
+      // Only POST pings a buyer, so cap it per IP like the chat endpoint.
+      if (req.method === 'POST') {
+        const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+        if (!rateLimit(ip)) {
+          addSecurityHeaders(res);
+          res.writeHead(429, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Too many requests. Please try again shortly.' }));
+          return;
+        }
+      }
       try {
         const number = await getDniNumber(service, visitorId);
         if (!number) {
