@@ -549,17 +549,21 @@
           t.remove();
           convo.push({ role: 'assistant', content: data.reply });
           addMsg('assistant', data.reply);
-          if (data.service) cardEl = addCallCard(data.service, data.servicePhone);
           if (data.callNow && data.callNow.phone) addCallNowCard(data.service, data.callNow);
-          // If qualified, replace the static number with a unique DNI number.
           if (data.complete && data.service && !data.callNow) {
+            // Qualified: always show the correct, per-visitor DNI tracking number.
+            // Fetch it, build the call card with it, and only fall back to the
+            // static service number if the DNI request fails.
             var visitorId = (window.__visitorId || (window.__visitorId = 'v' + Date.now() + Math.random().toString(36).slice(2, 8)));
             fetch('/api/dni?service=' + encodeURIComponent(data.service) + '&visitorId=' + encodeURIComponent(visitorId))
               .then(function (r) { return r.json(); })
               .then(function (dni) {
-                if (dni.ok) updateCallCardNumber(cardEl, { e164: dni.e164, display: dni.display });
+                if (dni.ok && dni.e164) addCallCard(data.service, { e164: dni.e164, display: dni.display });
+                else addCallCard(data.service, data.servicePhone);
               })
-              .catch(function () {});
+              .catch(function () { addCallCard(data.service, data.servicePhone); });
+          } else if (data.service) {
+            addCallCard(data.service, data.servicePhone);
           }
           sendBtn.disabled = false;
           text.focus({ preventScroll: true });
