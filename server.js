@@ -15,7 +15,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname; // fixit-ai/
-const LEADS_FILE = path.join(ROOT, 'leads.json');
+const LEADS_FILE = path.join(ROOT, '.data', 'leads.json');
 
 // ---------------------------------------------------------------------------
 // Config from .env
@@ -203,6 +203,7 @@ function loadLeads() {
 function saveLead(lead) {
   const leads = loadLeads();
   leads.push({ ...lead, capturedAt: new Date().toISOString() });
+  fs.mkdirSync(path.dirname(LEADS_FILE), { recursive: true });
   fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
 }
 
@@ -690,6 +691,7 @@ async function handleChat(messages) {
           const leads = loadLeads();
           if (leads.length) {
             leads[leads.length - 1].proaxis = recWithBid.proaxis;
+            fs.mkdirSync(path.dirname(LEADS_FILE), { recursive: true });
             fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
           }
           // Make the bridge number available to the chat UI so the visitor
@@ -904,9 +906,28 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // Static files
+    // Static files. NOTE: only explicitly allowed public files are served.
+    // Never serve source files (server.js, package.json, .env), lead data,
+    // or anything else not in the allow-list below.
+    const PUBLIC_FILE_ALLOWLIST = new Set([
+      '/index.html', '/chat.html', '/privacy.html', '/terms.html',
+      '/call-timing-flow.html', '/robots.txt', '/sitemap.xml',
+      '/65a1b3bdc7ed6b7bda5d7b7e3a79809e.txt', // IndexNow key
+    ]);
     let pathname = decodeURIComponent(url.pathname);
     if (pathname === '/' || pathname === '') pathname = '/index.html';
+
+    const isAllowed =
+      PUBLIC_FILE_ALLOWLIST.has(pathname) ||
+      (pathname.startsWith('/guides/') && path.extname(pathname) === '.html');
+
+    if (!isAllowed) {
+      addSecurityHeaders(res);
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not found');
+      return;
+    }
+
     const filePath = path.join(ROOT, path.normalize(pathname).replace(/^([/\\])+/, ''));
     const ext = path.extname(filePath).toLowerCase();
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {

@@ -1,7 +1,11 @@
 # Secrets — never commit
 .env
+.env.*
+!.env.example
 
 # Visitor/customer data — keep private
+.data/
+leads.json
 fixit-ai/leads.json
 
 # Local tunnels / logs
