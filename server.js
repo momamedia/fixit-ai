@@ -920,6 +920,7 @@ const server = http.createServer(async (req, res) => {
     const isAllowed =
       PUBLIC_FILE_ALLOWLIST.has(pathname) ||
       (pathname.startsWith('/guides/') && path.extname(pathname) === '.html') ||
+      (pathname.startsWith('/cost/') && path.extname(pathname) === '.html') ||
       (pathname.startsWith('/images/services/') && path.extname(pathname) === '.svg');
 
     if (!isAllowed) {

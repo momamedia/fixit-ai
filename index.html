@@ -144,6 +144,18 @@
     .svc.callable::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--green); border-radius: var(--radius) var(--radius) 0 0; }
     .call-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 12px; font-size: 12px; font-weight: 700; color: #0b6b2f; background: rgba(52,199,89,.15); padding: 4px 11px; border-radius: 980px; }
 
+    /* ===== Cost calculator ===== */
+    .cost-calc { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; background: #fff; border-radius: var(--radius); padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .cost-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; }
+    .cost-fields label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .cost-fields select, .cost-fields input { width: 100%; font-family: var(--font); font-size: 16px; padding: 11px 13px; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; color: var(--text); }
+    .cost-result { background: var(--bg-alt); border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; justify-content: center; }
+    .cost-amount { font-size: 34px; font-weight: 600; letter-spacing: -.02em; color: var(--text); }
+    .cost-note { font-size: 14px; color: var(--text-2); margin: 6px 0 16px; }
+    .cost-result .btn-primary { display: inline-block; text-align: center; background: var(--blue); color: #fff; border-radius: 980px; padding: 11px 20px; font-size: 15px; font-weight: 500; }
+    .cost-result .btn-primary:hover { background: var(--blue-dark); text-decoration: none; }
+    @media (max-width: 860px) { .cost-calc { grid-template-columns: 1fr; } .cost-fields { grid-template-columns: 1fr; } }
+
     .all-services { background: var(--bg-alt); }
     .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .cat { background: var(--bg); border-radius: var(--radius); padding: 28px; }
@@ -257,6 +269,7 @@
   <!-- Header -->
   <header class="topbar">
     <div class="topbar-right">
+      <a href="/cost/index.html" style="font-size:13px;color:var(--text-2);font-weight:500">Costs</a>
       <a href="/guides/index.html" style="font-size:13px;color:var(--text-2);font-weight:500">Guides</a>
       <span class="online"><span class="dot"></span>AI Assistant</span>
       <button class="btn-link" id="newChat">+ New chat</button>
@@ -309,6 +322,41 @@
         <div class="svc callable il appliance"><div class="icon">🔌</div><h3>Appliance Repair</h3><p>Dishwasher, fridge, washer &amp; dryer.</p><span class="call-badge">📞 Call available</span></div>
         <div class="svc callable il plumbing"><div class="icon">🚿</div><h3>Plumbing</h3><p>Leaks, drains, water heaters &amp; pipes.</p><span class="call-badge">📞 Call available</span></div>
       </div>
+    </div>
+  </section>
+
+  <!-- Cost calculator -->
+  <section id="cost" class="all-services">
+    <div class="container">
+      <div class="section-head">
+        <h2>What will it cost?</h2>
+        <p>Pick a service and your city, enter the amount of work, and get an instant estimate.</p>
+      </div>
+      <div class="cost-calc">
+        <div class="cost-fields">
+          <div>
+            <label for="ccService">Service</label>
+            <select id="ccService"></select>
+          </div>
+          <div>
+            <label for="ccCity">City</label>
+            <select id="ccCity"></select>
+          </div>
+          <div>
+            <label for="ccQty" id="ccQtyLabel">Hours needed</label>
+            <input id="ccQty" type="number" min="0" step="any" value="2">
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <span style="font-size:13px;color:var(--text-2)">Estimates use local labor rates for the city you pick.</span>
+          </div>
+        </div>
+        <div class="cost-result">
+          <div class="cost-amount" id="ccOut">&nbsp;</div>
+          <div class="cost-note" id="ccNote"></div>
+          <a class="btn-primary" id="ccLink" href="/cost/index.html">See full price breakdown</a>
+        </div>
+      </div>
+      <p style="text-align:center;margin-top:20px"><a href="/cost/index.html">Browse cost guides for all 50 cities and 16 services &rsaquo;</a></p>
     </div>
   </section>
 
@@ -451,6 +499,7 @@
             <li><a href="#all-services">HVAC &amp; Electrical</a></li>
             <li><a href="#all-services">Cleaning</a></li>
             <li><a href="/guides/index.html">How-to Guides</a></li>
+            <li><a href="/cost/index.html">Cost Guides</a></li>
             <li><a href="#top">Talk to the AI</a></li>
           </ul>
         </div>
@@ -672,6 +721,75 @@
       // Footer year + smooth scroll for the "Talk to the AI" buttons
       document.getElementById('year').textContent = new Date().getFullYear();
     })();
+  </script>
+
+  <!-- Cost calculator data (generated by generate-cost.js) -->
+  <!--COSTDATA-->
+  <script id="costData" type="application/json">{"services":[{"s":"plumber","n":"Plumbing","r":95,"u":"hour","up":"hours","d":2,"m":120},{"s":"electrician","n":"Electrical","r":95,"u":"hour","up":"hours","d":2,"m":110},{"s":"hvac","n":"HVAC","r":110,"u":"hour","up":"hours","d":2,"m":130},{"s":"roofer","n":"Roofing","r":90,"u":"hour","up":"hours","d":3,"m":150},{"s":"garage-door","n":"Garage Door","r":90,"u":"hour","up":"hours","d":1,"m":100},{"s":"locksmith","n":"Locksmith","r":85,"u":"hour","up":"hours","d":1,"m":90},{"s":"water-damage-restoration","n":"Water Damage Restoration","r":110,"u":"hour","up":"hours","d":4,"m":250},{"s":"mold-removal","n":"Mold Removal","r":100,"u":"hour","up":"hours","d":4,"m":250},{"s":"appliance-repair","n":"Appliance Repair","r":95,"u":"hour","up":"hours","d":1,"m":100},{"s":"handyman","n":"Handyman","r":75,"u":"hour","up":"hours","d":2,"m":75},{"s":"dumpster-rental","n":"Dumpster Rental","r":55,"u":"day","up":"days","d":7,"m":250},{"s":"portable-toilet-rental","n":"Portable Toilet Rental","r":45,"u":"day","up":"days","d":7,"m":100},{"s":"window-installation","n":"Window Installation","r":550,"u":"window","up":"windows","d":5,"m":350},{"s":"siding","n":"Siding","r":9,"u":"sq ft","up":"sq ft","d":500,"m":1500},{"s":"gutter-services","n":"Gutter Services","r":8,"u":"linear ft","up":"linear ft","d":150,"m":150},{"s":"pest-control","n":"Pest Control","r":120,"u":"treatment","up":"treatments","d":4,"m":100}],"cities":[{"s":"new-york-ny","n":"New York, NY","i":1.45},{"s":"los-angeles-ca","n":"Los Angeles, CA","i":1.3},{"s":"chicago-il","n":"Chicago, IL","i":1.15},{"s":"houston-tx","n":"Houston, TX","i":0.95},{"s":"phoenix-az","n":"Phoenix, AZ","i":0.98},{"s":"philadelphia-pa","n":"Philadelphia, PA","i":1.12},{"s":"san-antonio-tx","n":"San Antonio, TX","i":0.92},{"s":"san-diego-ca","n":"San Diego, CA","i":1.28},{"s":"dallas-tx","n":"Dallas, TX","i":0.98},{"s":"san-jose-ca","n":"San Jose, CA","i":1.45},{"s":"austin-tx","n":"Austin, TX","i":1.02},{"s":"jacksonville-fl","n":"Jacksonville, FL","i":0.93},{"s":"fort-worth-tx","n":"Fort Worth, TX","i":0.95},{"s":"columbus-oh","n":"Columbus, OH","i":0.98},{"s":"charlotte-nc","n":"Charlotte, NC","i":0.97},{"s":"indianapolis-in","n":"Indianapolis, IN","i":0.95},{"s":"san-francisco-ca","n":"San Francisco, CA","i":1.5},{"s":"seattle-wa","n":"Seattle, WA","i":1.28},{"s":"denver-co","n":"Denver, CO","i":1.08},{"s":"washington-dc","n":"Washington, DC","i":1.22},{"s":"nashville-tn","n":"Nashville, TN","i":1},{"s":"oklahoma-city-ok","n":"Oklahoma City, OK","i":0.88},{"s":"el-paso-tx","n":"El Paso, TX","i":0.85},{"s":"boston-ma","n":"Boston, MA","i":1.3},{"s":"portland-or","n":"Portland, OR","i":1.12},{"s":"las-vegas-nv","n":"Las Vegas, NV","i":1},{"s":"detroit-mi","n":"Detroit, MI","i":0.92},{"s":"memphis-tn","n":"Memphis, TN","i":0.88},{"s":"louisville-ky","n":"Louisville, KY","i":0.9},{"s":"baltimore-md","n":"Baltimore, MD","i":1.05},{"s":"milwaukee-wi","n":"Milwaukee, WI","i":0.98},{"s":"albuquerque-nm","n":"Albuquerque, NM","i":0.88},{"s":"tucson-az","n":"Tucson, AZ","i":0.9},{"s":"fresno-ca","n":"Fresno, CA","i":0.95},{"s":"sacramento-ca","n":"Sacramento, CA","i":1.1},{"s":"kansas-city-mo","n":"Kansas City, MO","i":0.95},{"s":"mesa-az","n":"Mesa, AZ","i":0.98},{"s":"atlanta-ga","n":"Atlanta, GA","i":1.02},{"s":"omaha-ne","n":"Omaha, NE","i":0.92},{"s":"colorado-springs-co","n":"Colorado Springs, CO","i":1},{"s":"raleigh-nc","n":"Raleigh, NC","i":1},{"s":"virginia-beach-va","n":"Virginia Beach, VA","i":0.98},{"s":"long-beach-ca","n":"Long Beach, CA","i":1.3},{"s":"miami-fl","n":"Miami, FL","i":1.1},{"s":"oakland-ca","n":"Oakland, CA","i":1.32},{"s":"minneapolis-mn","n":"Minneapolis, MN","i":1.08},{"s":"tulsa-ok","n":"Tulsa, OK","i":0.88},{"s":"bakersfield-ca","n":"Bakersfield, CA","i":0.95},{"s":"wichita-ks","n":"Wichita, KS","i":0.87},{"s":"arlington-tx","n":"Arlington, TX","i":0.95}]}</script>
+  <!--/COSTDATA-->
+  <script>
+  (function () {
+    var dataEl = document.getElementById('costData');
+    if (!dataEl) return;
+    var DATA;
+    try { DATA = JSON.parse(dataEl.textContent); } catch (e) { return; }
+    if (!DATA || !DATA.services || !DATA.services.length) return;
+
+    var selS = document.getElementById('ccService');
+    var selC = document.getElementById('ccCity');
+    var qty = document.getElementById('ccQty');
+    var label = document.getElementById('ccQtyLabel');
+    var out = document.getElementById('ccOut');
+    var note = document.getElementById('ccNote');
+    var link = document.getElementById('ccLink');
+    if (!selS || !selC || !qty) return;
+
+    function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+    DATA.services.forEach(function (s, i) {
+      var o = document.createElement('option');
+      o.value = i; o.textContent = s.n;
+      selS.appendChild(o);
+    });
+    DATA.cities.forEach(function (c, i) {
+      var o = document.createElement('option');
+      o.value = i; o.textContent = c.n;
+      if (c.s === 'houston-tx') o.selected = true;
+      selC.appendChild(o);
+    });
+
+    function pick() {
+      return {
+        s: DATA.services[parseInt(selS.value, 10) || 0],
+        c: DATA.cities[parseInt(selC.value, 10) || 0]
+      };
+    }
+
+    function compute() {
+      var p = pick();
+      var s = p.s, c = p.c;
+      var q = parseFloat(qty.value);
+      if (!isFinite(q) || q <= 0) q = 1;
+      var rate = s.r * c.i;
+      var base = q * rate;
+      if (base < s.m * c.i) base = s.m * c.i;
+      out.textContent = fmt(base * 0.85) + ' - ' + fmt(base * 1.15);
+      note.textContent = 'Estimated for ' + q + ' ' + (q === 1 ? s.u : s.up) + ' in ' + c.n + '.';
+      link.href = '/cost/' + s.s + '-cost-in-' + c.s + '.html';
+    }
+
+    function onService() {
+      var s = pick().s;
+      label.textContent = s.up.charAt(0).toUpperCase() + s.up.slice(1) + ' needed';
+      qty.value = s.d;
+      compute();
+    }
+
+    selS.addEventListener('change', onService);
+    selC.addEventListener('change', compute);
+    qty.addEventListener('input', compute);
+    onService();
+  })();
   </script>
 </body>
 </html>
