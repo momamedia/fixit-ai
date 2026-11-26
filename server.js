@@ -814,6 +814,7 @@ const MIME = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.txt': 'text/plain',
+  '.xml': 'application/xml; charset=utf-8',
 };
 
 const server = http.createServer(async (req, res) => {
