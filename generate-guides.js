@@ -10,7 +10,7 @@ const ROOT = __dirname;
 const OUT = path.join(ROOT, 'guides');
 const YEAR = 2027;
 // Public site URL used for sitemap and canonical links (set for production indexing).
-const BASE = (process.env.SITE_BASE_URL || 'https://fixit.ai').replace(/\/+$/, '');
+const BASE = (process.env.SITE_BASE_URL || 'https://topshieldhome.com').replace(/\/+$/, '');
 
 const verticals = [
   {
@@ -337,7 +337,7 @@ function renderPage(v, topic, idx, total) {
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="/index.html"><span class="logo">🔧</span><span>Top Shield<em>.home</em></span></a>
+    <a class="brand" href="/index.html"><span class="logo">🔧</span><span>Top Shield Home Services</span></a>
     <a class="btn" href="/index.html">Chat with AI</a>
   </header>
   <section class="hero"><div class="wrap">
@@ -412,13 +412,13 @@ main{padding:40px 0 80px} ul{list-style:none;display:grid;grid-template-columns:
 li a{display:block;background:var(--bg-alt);padding:14px 16px;border-radius:14px;color:var(--text);font-size:15px} li a:hover{background:#e8e8ed;text-decoration:none}
 footer{text-align:center;color:var(--text-2);font-size:13px;padding:30px 0;background:var(--bg-alt)}
 </style></head><body>
-<header class="topbar"><a class="brand" href="/index.html"><span class="logo">🔧</span><span>Top Shield<em>.home</em></span></a><a class="btn" href="/index.html">Chat with AI</a></header>
+<header class="topbar"><a class="brand" href="/index.html"><span class="logo">🔧</span><span>Top Shield Home Services</span></a><a class="btn" href="/index.html">Chat with AI</a></header>
 <section class="hero"><div class="wrap"><p style="color:#0071e3;font-weight:600;font-size:14px;margin-bottom:8px"><a href="/guides/index.html">Home Guides</a> · ${YEAR}</p>
 <h1>${esc(v.name)} How-To Guides</h1><p class="lede">${esc(v.intro)} Browse all ${pages.length} guides below.</p></div></section>
 <main><div class="wrap"><ul>
 ${items}
 </ul></div></main>
-<footer><div class="wrap">© ${YEAR} FixIt.ai · <a href="/index.html">Home</a> · <a href="/guides/index.html">All Guides</a></div></footer>
+<footer><div class="wrap">© ${YEAR} Top Shield Home Services · <a href="/index.html">Home</a> · <a href="/guides/index.html">All Guides</a></div></footer>
 </body></html>`;
 }
 
@@ -429,7 +429,7 @@ function renderHub(verticalData) {
   }).join('\n');
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home Service How-To Guides ${YEAR} | FixIt.ai</title>
+<title>Home Service How-To Guides ${YEAR} | Top Shield Home Services</title>
 <meta name="description" content="Browse ${verticalData.reduce((a,v)=>a+v.pages.length,0)} practical how-to guides for roofing, gutters, plumbing, HVAC, windows, and appliance repair — updated for ${YEAR}.">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -447,10 +447,10 @@ ul{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(26
 li a{display:block;background:#fff;padding:12px 14px;border-radius:12px;color:var(--text);font-size:15px}
 footer{text-align:center;color:var(--text-2);font-size:13px;padding:30px 0;background:var(--bg-alt)}
 </style></head><body>
-<header class="topbar"><a class="brand" href="/index.html"><span class="logo">🔧</span><span>Top Shield<em>.home</em></span></a><a class="btn" href="/index.html">Chat with AI</a></header>
+<header class="topbar"><a class="brand" href="/index.html"><span class="logo">🔧</span><span>Top Shield Home Services</span></a><a class="btn" href="/index.html">Chat with AI</a></header>
 <section class="hero"><div class="wrap"><h1>Home How-To Guides for ${YEAR}</h1><p class="lede">Practical, step-by-step guides across ${verticalData.length} home service categories — ${verticalData.reduce((a,v)=>a+v.pages.length,0)} guides to help you troubleshoot, maintain, and know when to call a pro.</p></div></section>
 <main class="wrap">${sections}</main>
-<footer><div class="wrap">© ${YEAR} FixIt.ai · <a href="/index.html">Home</a></div></footer>
+<footer><div class="wrap">© ${YEAR} Top Shield Home Services · <a href="/index.html">Home</a></div></footer>
 </body></html>`;
 }
 
