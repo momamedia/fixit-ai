@@ -200,14 +200,29 @@
         return el;
       }
 
-      function addCallCard(service, servicePhone) {
-        if (!servicePhone || !servicePhone.e164) return;
+      function setCallStatus(card, opts, service) {
+        var s = card && card.querySelector('.call-status');
+        if (!s) return;
+        if (opts && opts.available === false) {
+          s.textContent = 'All ' + (service || '') + ' lines are busy right now — checking again automatically.';
+          s.style.color = '#b3261e';
+        } else if (opts && opts.available === true) {
+          s.textContent = 'A technician is standing by — call now.';
+          s.style.color = '#0b6b2f';
+        } else {
+          s.textContent = '';
+        }
+      }
+
+      function addCallCard(service, servicePhone, opts) {
+        if (!servicePhone || !servicePhone.e164) return null;
         showMsgs();
         var card = document.createElement('div');
         card.className = 'callcard';
         card.innerHTML =
           '<h5>Who to call</h5>' +
           '<p>The ' + service + ' team at Top Shield Home Services can help you.</p>' +
+          '<p class="call-status" style="font-size:13px;margin:0 0 8px;color:var(--text-2)"></p>' +
           '<a href="tel:' + servicePhone.e164 + '">📞 Call ' + servicePhone.display + '</a>';
         var row = document.createElement('div');
         row.className = 'msg assistant';
@@ -215,6 +230,50 @@
         row.appendChild(avatar); row.appendChild(card);
         msgs.appendChild(row);
         scrollToBottom();
+        setCallStatus(card, opts, service);
+        return card;
+      }
+
+      // Keep the visitor's per-call reservation alive while the card is shown.
+      function reserveCall(service, ctx, card, visitorId) {
+        if (!ctx || !ctx.phone || !card) return;
+        var busy = false;
+        card.__rtbStarted = Date.now();
+        function request() {
+          if (busy) return;
+          busy = true;
+          fetch('/api/dni', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service: service,
+              visitorId: visitorId,
+              phone: ctx.phone,
+              zip: ctx.zip || '',
+              state: ctx.state || '',
+            }),
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (dni) {
+            if (dni && dni.ok && dni.e164) {
+              var a = card.querySelector('a');
+              if (a) { a.href = 'tel:' + dni.e164; a.textContent = '📞 Call ' + dni.display; }
+              setCallStatus(card, dni, service);
+              if (dni.refreshMs > 0 && !card.__rtbTimer) {
+                card.__rtbTimer = setInterval(function () {
+                  if (!card.isConnected || Date.now() - card.__rtbStarted > 5 * 60 * 1000) {
+                    clearInterval(card.__rtbTimer);
+                    card.__rtbTimer = null;
+                    return;
+                  }
+                  request();
+                }, Math.max(4000, dni.refreshMs));
+              }
+            }
+            busy = false;
+          }, function () { busy = false; });
+        }
+        request();
       }
 
       // "Call now" card shown when Proaxis accepts a lead and returns a
@@ -262,15 +321,11 @@
           addMsg('assistant', data.reply);
           if (data.callNow && data.callNow.phone) addCallNowCard(data.service, data.callNow);
           if (data.complete && data.service && !data.callNow) {
-            // Qualified: always show the correct, per-visitor DNI tracking number.
             var visitorId = (window.__visitorId || (window.__visitorId = 'v' + Date.now() + Math.random().toString(36).slice(2, 8)));
-            fetch('/api/dni?service=' + encodeURIComponent(data.service) + '&visitorId=' + encodeURIComponent(visitorId))
-              .then(function (r) { return r.json(); })
-              .then(function (dni) {
-                if (dni.ok && dni.e164) addCallCard(data.service, { e164: dni.e164, display: dni.display });
-                else addCallCard(data.service, data.servicePhone);
-              })
-              .catch(function () { addCallCard(data.service, data.servicePhone); });
+            var card = addCallCard(data.service, data.servicePhone);
+            if (card && data.callContext && data.callContext.phone) {
+              reserveCall(data.service, data.callContext, card, visitorId);
+            }
           } else if (data.service) {
             addCallCard(data.service, data.servicePhone);
           }

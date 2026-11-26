@@ -68,6 +68,9 @@ const CFG = {
   // attributed to the service/landing the visitor came from.
   leadrouterEndpoint: (env.LEADROUTER_BASE_URL || 'https://theleadrouter.com').replace(/\/+$/, ''),
   leadrouterKey: env.LEADROUTER_API_KEY || '',
+  // RTB publisher pings need the calls_rtb scope. A dedicated key can be set
+  // with LEADROUTER_RTB_API_KEY; the admin key is used as a fallback.
+  leadrouterRtbKey: env.LEADROUTER_RTB_API_KEY || env.LEADROUTER_API_KEY || '',
 };
 
 // Dynamic Number Insertion (DNI): per-service campaign spec tokens used to mint a
@@ -91,6 +94,116 @@ const SERVICE_DNI_SPEC = {
   'Portable Toilet':          '6afb96ec-6904-4047-95fb-6c84c0e2377c',
   'Siding':                   '526722e5-e322-4a7b-9d2e-b64f897acab9',
 };
+
+// Each DNI campaign is RTB-only. A click-to-call must ping its campaign with
+// the caller's number before the call arrives, otherwise Lead Router has no
+// reservation to claim and the call is rejected with LR-103.
+const SERVICE_RTB_CAMPAIGN = {
+  'Window Installation':      '67974e32-52c3-4793-ba59-6b62929d523d',
+  'HVAC Installation':        '6ac998ed-1a55-455a-894b-f4fd599a2015',
+  'Plumbing':                 '0d2f5a93-efb1-4122-8cd4-9e977a58829c',
+  'Roofing':                  '0e06bbab-aa7d-407a-9492-8f868380a0aa',
+  'Appliance Repair':         '11436e3b-d50a-4b50-a405-76d7e581e508',
+  'Gutter Services':          '640d8cd5-36a5-4f48-860d-8612843793c6',
+  'Mold Removal':             'c1679f85-59e5-4c5b-98dd-3dae27ca1e03',
+  'Water Damage Restoration': 'a34646c7-7ce6-4e08-a541-b93b86371e2f',
+  'Pest Control':             '4395445d-259b-4179-8ced-0f2cd8786c49',
+  'Dumpster Rental':          'b6c4228e-a9a3-4095-8c4d-cc0fd4c383c3',
+  'Electrical & Panels':      'f2d31840-6e27-4599-a442-d9d1267841d8',
+  'Final Expense':            '5cb6824e-860a-46d3-b14e-a9ded5ac8096',
+  'Garage Door Repair':       '4481916f-e85d-4579-90ca-3f00c5e31dea',
+  'Handyman':                 '5e1c3979-404a-488c-86d1-ae8298280e70',
+  'Locksmith':                'b9514608-a912-4986-a68b-14391f8d4f0a',
+  'Portable Toilet':          '6e16396b-58a8-4fa8-9da9-52b9789e67c1',
+  'Siding':                   'a2589ba9-bb7b-45b0-bd25-80260123dd13',
+};
+
+// Cache the DNI number per visitor + service for 30 minutes so refreshing an
+// RTB reservation every few seconds does not mint a new tracking number.
+const DNI_CACHE = new Map();
+const DNI_CACHE_MS = 30 * 60 * 1000;
+
+async function getDniNumber(service, visitorId) {
+  const specToken = SERVICE_DNI_SPEC[service];
+  if (!specToken) return null;
+  const key = service + '|' + (visitorId || '');
+  const hit = DNI_CACHE.get(key);
+  if (hit && Date.now() - hit.at < DNI_CACHE_MS) return hit.value;
+
+  try {
+    const body = JSON.stringify({
+      specToken,
+      visitorId: visitorId || undefined,
+      url: 'https://topshieldhome.com/',
+    });
+    const lr = await fetch(CFG.leadrouterEndpoint + '/api/public/dni/impressions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    const txt = await lr.text().catch(() => '');
+    let json = null;
+    try { json = JSON.parse(txt); } catch {}
+    if (!lr.ok || !json || !json.data || !json.data.number) return null;
+    const num = json.data.number;
+    const digits = String(num).replace(/\D/g, '');
+    const value = {
+      e164: num,
+      display: digits.length >= 10
+        ? `(${digits.slice(-10, -7)}) ${digits.slice(-7, -4)}-${digits.slice(-4)}`
+        : num,
+      impressionId: json.data.impressionId || null,
+    };
+    DNI_CACHE.set(key, { at: Date.now(), value });
+    return value;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Ping Lead Router for a live buyer reservation before the visitor dials.
+async function pingCallRtb(service, lead) {
+  const campaignId = SERVICE_RTB_CAMPAIGN[service];
+  if (!campaignId) return { ok: false, reason: 'no_campaign' };
+  if (!CFG.leadrouterRtbKey) return { ok: false, reason: 'no_key' };
+  const callerNumber = toE164(lead.phone);
+  if (!callerNumber) return { ok: false, reason: 'no_phone' };
+  const zip = String(lead.zip || '').replace(/[^\d-]/g, '').slice(0, 10);
+  const state = String(lead.state || (zip && ZIP_STATE[zip.slice(0, 3)]) || '').toUpperCase().slice(0, 2);
+  try {
+    const res = await fetch(CFG.leadrouterEndpoint + '/api/v1/calls/rtb/ping', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + CFG.leadrouterRtbKey,
+      },
+      body: JSON.stringify({
+        mode: 'rtb',
+        campaignId,
+        callerNumber,
+        state: state || undefined,
+        zip: zip || undefined,
+        sub1: service,
+        sub2: lead.visitorId || '',
+        source: 'topshieldhome-chat',
+      }),
+    });
+    const txt = await res.text().catch(() => '');
+    let json = null;
+    try { json = JSON.parse(txt); } catch {}
+    return {
+      ok: res.ok,
+      status: res.status,
+      available: !!(json && json.available === true),
+      reasonCode: (json && (json.reasonCode || json.reason)) || null,
+      expiresInSec: (json && json.expiresInSec) || null,
+      expiresAt: (json && json.expiresAt) || null,
+      hasReservationId: !!(json && json.reservationId),
+    };
+  } catch (e) {
+    return { ok: false, reason: 'network' };
+  }
+}
 
 // Business + service phone routing (800Calls numbers clients can dial).
 const BUSINESS = { name: 'Top Shield Home Services' };
@@ -566,6 +679,7 @@ async function callLlm(messages) {
 async function handleChat(messages) {
   const text = messages.filter(m => m.role === 'user').map(m => m.content).join(' ');
   let callNow = null; // { phone, bid } when Proaxis accepts a roofing lead
+  let callContext = null; // caller details needed for the pre-call RTB ping
 
   // Try the real AI first (with one retry — the model occasionally skips its
   // JSON footer on short first turns).
@@ -668,6 +782,7 @@ async function handleChat(messages) {
         service: service || 'Unclassified',
         transcript: messages.filter(m => m.role === 'user').map(m => m.content).join(' | '),
       };
+      callContext = { phone: rec.phone, zip: rec.zipCode, state: rec.state };
       if (rec.phone) {
         saveLead(rec);
         // Tell the Lead Router about the caller so an inbound call to our
@@ -704,7 +819,7 @@ async function handleChat(messages) {
     }
 
     const servicePhone = qualified ? getServicePhone(service) : null;
-    return { reply: parsed.reply || 'Thanks for your message!', service: qualified ? service : null, complete: qualified, servicePhone };
+    return { reply: parsed.reply || 'Thanks for your message!', service: qualified ? service : null, complete: qualified, servicePhone, callContext };
   }
 
   // -----------------------------------------------------------------------
@@ -755,6 +870,7 @@ async function handleChat(messages) {
       transcript: messages.filter(m => m.role === 'user').map(m => m.content).join(' | '),
     };
     saveLead(rec);
+    callContext = { phone: rec.phone, zip: rec.zipCode, state: rec.state };
     if (rec.phone) {
       const lr = await postCallData(rec);
       if (!lr.ok) {
@@ -771,6 +887,7 @@ async function handleChat(messages) {
       service: rec.service,
       complete: true,
       servicePhone,
+      callContext,
     };
   }
   return {
@@ -831,37 +948,63 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // API: DNI — return a unique per-visitor tracking number for a service
+    // API: DNI + pre-call RTB quote.
+    // GET keeps the old number-only behaviour. POST with the caller's details
+    // pings the service's RTB campaign first, so a tap has a live reservation.
     if (url.pathname === '/api/dni') {
-      const service = (url.searchParams.get('service') || '').trim();
-      const visitorId = (url.searchParams.get('visitorId') || '').trim().slice(0, 120);
-      const specToken = SERVICE_DNI_SPEC[service];
-      if (!specToken) {
+      let service = (url.searchParams.get('service') || '').trim();
+      let visitorId = (url.searchParams.get('visitorId') || '').trim().slice(0, 120);
+      let phone = (url.searchParams.get('phone') || '').trim().slice(0, 40);
+      let zip = (url.searchParams.get('zip') || '').trim().slice(0, 10);
+      let state = (url.searchParams.get('state') || '').trim().slice(0, 2);
+      if (req.method === 'POST') {
+        let raw = '';
+        req.on('data', c => { raw += c; if (raw.length > 1e5) req.destroy(); });
+        await new Promise(resolve => req.on('end', resolve));
+        let body = {};
+        try { body = JSON.parse(raw || '{}'); } catch {}
+        service = String(body.service || service).trim();
+        visitorId = String(body.visitorId || visitorId).trim().slice(0, 120);
+        phone = String(body.phone || phone).trim().slice(0, 40);
+        zip = String(body.zip || zip).trim().slice(0, 10);
+        state = String(body.state || state).trim().slice(0, 2);
+      }
+      if (!SERVICE_DNI_SPEC[service]) {
         addSecurityHeaders(res);
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'no_spec_for_service' }));
         return;
       }
       try {
-        const body = JSON.stringify({ specToken, visitorId: visitorId || undefined, url: 'https://topshieldhome.com/' });
-        const lr = await fetch(CFG.leadrouterEndpoint + '/api/public/dni/impressions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body,
-        });
-        const txt = await lr.text().catch(() => '');
-        let json = null;
-        try { json = JSON.parse(txt); } catch {}
-        addSecurityHeaders(res);
-        res.writeHead(lr.status, { 'Content-Type': 'application/json' });
-        if (json && json.data && json.data.number) {
-          const num = json.data.number;
-          const digits = String(num).replace(/\D/g, '');
-          const pretty = digits.length >= 10 ? `(${digits.slice(-10, -7)}) ${digits.slice(-7, -4)}-${digits.slice(-4)}` : num;
-          res.end(JSON.stringify({ ok: true, e164: num, display: pretty, impressionId: json.data.impressionId }));
-        } else {
-          res.end(JSON.stringify({ error: 'dni_failed', detail: txt.slice(0, 200) }));
+        const number = await getDniNumber(service, visitorId);
+        if (!number) {
+          addSecurityHeaders(res);
+          res.writeHead(502, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'dni_failed' }));
+          return;
         }
+        let ping = null;
+        if (phone && req.method === 'POST') {
+          ping = await pingCallRtb(service, { phone, zip, state, visitorId });
+        }
+        // A live quote is refreshed before it expires. If no buyer is available
+        // right now, keep checking every few seconds instead of giving up.
+        const refreshSec = ping && ping.available && ping.expiresInSec
+          ? Math.max(4, ping.expiresInSec - 5)
+          : (ping && ping.available === false ? 5 : 0);
+        addSecurityHeaders(res);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          ok: true,
+          e164: number.e164,
+          display: number.display,
+          impressionId: number.impressionId,
+          available: ping ? ping.available : null,
+          reasonCode: ping ? ping.reasonCode : null,
+          expiresInSec: ping ? ping.expiresInSec : null,
+          refreshMs: refreshSec ? refreshSec * 1000 : 0,
+          pingError: ping && !ping.ok ? (ping.reason || ping.status || 'ping_failed') : null,
+        }));
       } catch (e) {
         addSecurityHeaders(res);
         res.writeHead(500, { 'Content-Type': 'application/json' });

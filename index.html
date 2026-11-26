@@ -569,23 +569,83 @@
         return el;
       }
 
-      function addCallCard(service, servicePhone) {
+      function setCallStatus(el, opts, service) {
+        if (!el) return;
+        var s = el.querySelector('.call-status');
+        if (!s) return;
+        if (opts && opts.available === false) {
+          s.textContent = 'All ' + (service || '') + ' lines are busy right now — checking again automatically.';
+          s.style.color = '#b3261e';
+        } else if (opts && opts.available === true) {
+          s.textContent = 'A technician is standing by — call now.';
+          s.style.color = '#0b6b2f';
+        } else {
+          s.textContent = '';
+        }
+      }
+
+      function addCallCard(service, servicePhone, opts) {
         if (!servicePhone || !servicePhone.e164) return null;
         var el = document.createElement('div');
         el.className = 'callcard';
         el.innerHTML =
           '<h5>Who to call</h5>' +
           '<p>The ' + service + ' team at Top Shield Home Services can help you.</p>' +
+          '<p class="call-status" style="font-size:13px;margin:0 0 8px;color:var(--text-2)"></p>' +
           '<a href="tel:' + servicePhone.e164 + '">📞 Call ' + servicePhone.display + '</a>';
         bodyEl.appendChild(el);
         bodyEl.scrollTop = bodyEl.scrollHeight;
+        setCallStatus(el, opts, service);
         return el;
       }
 
-      function updateCallCardNumber(el, servicePhone) {
+      function updateCallCardNumber(el, servicePhone, opts, service) {
         if (!el || !servicePhone || !servicePhone.e164) return;
         var a = el.querySelector('a');
         if (a) { a.href = 'tel:' + servicePhone.e164; a.textContent = '📞 Call ' + servicePhone.display; }
+        setCallStatus(el, opts, service);
+      }
+
+      // A Lead Router RTB reservation is very short-lived, so while the call
+      // card is on screen we keep refreshing it. The tap itself stays a plain
+      // tel: link, which works on every phone.
+      function reserveCall(service, ctx, cardEl, visitorId) {
+        if (!ctx || !ctx.phone || !cardEl) return;
+        var busy = false;
+        cardEl.__rtbStarted = Date.now();
+        function request() {
+          if (busy) return;
+          busy = true;
+          fetch('/api/dni', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service: service,
+              visitorId: visitorId,
+              phone: ctx.phone,
+              zip: ctx.zip || '',
+              state: ctx.state || '',
+            }),
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (dni) {
+            if (dni && dni.ok && dni.e164) {
+              updateCallCardNumber(cardEl, { e164: dni.e164, display: dni.display }, dni, service);
+              if (dni.refreshMs > 0 && !cardEl.__rtbTimer) {
+                cardEl.__rtbTimer = setInterval(function () {
+                  if (!cardEl.isConnected || Date.now() - cardEl.__rtbStarted > 5 * 60 * 1000) {
+                    clearInterval(cardEl.__rtbTimer);
+                    cardEl.__rtbTimer = null;
+                    return;
+                  }
+                  request();
+                }, Math.max(4000, dni.refreshMs));
+              }
+            }
+            busy = false;
+          }, function () { busy = false; });
+        }
+        request();
       }
 
       function addCallNowCard(service, callNow) {
@@ -618,17 +678,13 @@
           addMsg('assistant', data.reply);
           if (data.callNow && data.callNow.phone) addCallNowCard(data.service, data.callNow);
           if (data.complete && data.service && !data.callNow) {
-            // Qualified: always show the correct, per-visitor DNI tracking number.
-            // Fetch it, build the call card with it, and only fall back to the
-            // static service number if the DNI request fails.
+            // Show a number immediately, then replace it with the visitor's own
+            // DNI number and keep a live buyer reservation behind it.
             var visitorId = (window.__visitorId || (window.__visitorId = 'v' + Date.now() + Math.random().toString(36).slice(2, 8)));
-            fetch('/api/dni?service=' + encodeURIComponent(data.service) + '&visitorId=' + encodeURIComponent(visitorId))
-              .then(function (r) { return r.json(); })
-              .then(function (dni) {
-                if (dni.ok && dni.e164) addCallCard(data.service, { e164: dni.e164, display: dni.display });
-                else addCallCard(data.service, data.servicePhone);
-              })
-              .catch(function () { addCallCard(data.service, data.servicePhone); });
+            cardEl = addCallCard(data.service, data.servicePhone);
+            if (cardEl && data.callContext && data.callContext.phone) {
+              reserveCall(data.service, data.callContext, cardEl, visitorId);
+            }
           } else if (data.service) {
             addCallCard(data.service, data.servicePhone);
           }
