@@ -185,6 +185,11 @@ async function pingCallRtb(service, lead) {
         zip: zip || undefined,
         sub1: service,
         sub2: lead.visitorId || '',
+        // zip/state are consumed by the ping itself and are NOT stored as
+        // publisher tags, so repeat them in sub3/sub4. The arriving call then
+        // shows the visitor's location in its tracking columns.
+        sub3: zip || undefined,
+        sub4: state || undefined,
         source: 'topshieldhome-chat',
       }),
     });
