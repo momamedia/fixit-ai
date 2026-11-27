@@ -592,7 +592,8 @@
           '<h5>Who to call</h5>' +
           '<p>The ' + service + ' team at Top Shield Home Services can help you.</p>' +
           '<p class="call-status" style="font-size:13px;margin:0 0 8px;color:var(--text-2)"></p>' +
-          '<a href="tel:' + servicePhone.e164 + '">📞 Call ' + servicePhone.display + '</a>';
+          '<a href="tel:' + servicePhone.e164 + '">📞 Call ' + servicePhone.display + '</a>' +
+          '<p style="font-size:12px;color:var(--text-2);margin:8px 0 0;">Stay on the line — connection can take a few seconds.</p>';
         bodyEl.appendChild(el);
         bodyEl.scrollTop = bodyEl.scrollHeight;
         setCallStatus(el, opts, service);
@@ -655,7 +656,8 @@
         el.innerHTML =
           '<h5>✅ You\'re matched with a ' + (service || 'home service') + ' pro!</h5>' +
           '<p>Tap below to be connected now.' + bid + '</p>' +
-          '<a href="tel:' + callNow.phone + '">📞 Call now</a>';
+          '<a href="tel:' + callNow.phone + '">📞 Call now</a>' +
+          '<p style="font-size:12px;color:var(--text-2);margin:8px 0 0;">Stay on the line — connection can take a few seconds.</p>';
         bodyEl.appendChild(el);
         bodyEl.scrollTop = bodyEl.scrollHeight;
       }
